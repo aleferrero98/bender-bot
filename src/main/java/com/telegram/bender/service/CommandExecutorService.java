@@ -87,4 +87,64 @@ public class CommandExecutorService {
       }
    }
 
+   public boolean executeTurnOffLeds() {
+      try {
+         Process process = new ProcessBuilder("sudo", "turn-off-leds").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al ejecutar turn-off-leds: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean executeReboot() {
+      try {
+         Process process = new ProcessBuilder("sudo", "reboot", "now").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al ejecutar reboot: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean executeShutdown() {
+      try {
+         Process process = new ProcessBuilder("sudo", "shutdown", "now").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al ejecutar shutdown: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean setCoolerSpeed(int speed) {
+      try {
+         Process process = new ProcessBuilder("sudo", "fan", String.valueOf(speed)).start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al setear velocidad del cooler: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean enableTempController() {
+      try {
+         Process process = new ProcessBuilder("sudo", "systemctl", "start", "temperature_controller.service").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al iniciar temperature_controller: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean disableTempController() {
+      try {
+         Process process = new ProcessBuilder("sudo", "systemctl", "stop", "temperature_controller.service").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al deshabilitar temperature_controller: {}", ex.getMessage());
+         return false;
+      }
+   }
+
 }

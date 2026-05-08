@@ -96,6 +96,58 @@ public class BenderBot extends AbilityBot {
                     .build();
    }
 
+   // Command /turn-off-leds
+   public Ability turnOffLeds() {
+      return Ability.builder()
+                    .name(EBotCommand.TURN_OFF_LEDS.getName())
+                    .info(EBotCommand.TURN_OFF_LEDS.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToTurnOffLeds(ctx.chatId());
+                    })
+                    .build();
+   }
+
+   // Command /reboot
+   public Ability reboot() {
+      return Ability.builder()
+                    .name(EBotCommand.REBOOT.getName())
+                    .info(EBotCommand.REBOOT.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToRebootConfirmation(ctx.chatId());
+                    })
+                    .build();
+   }
+
+   // Command /shutdown
+   public Ability shutdown() {
+      return Ability.builder()
+                    .name(EBotCommand.SHUTDOWN.getName())
+                    .info(EBotCommand.SHUTDOWN.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToShutdownConfirmation(ctx.chatId());
+                    })
+                    .build();
+   }
+
+   // Command /cooler
+   public Ability cooler() {
+      return Ability.builder()
+                    .name(EBotCommand.COOLER.getName())
+                    .info(EBotCommand.COOLER.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToCoolerMenu(ctx.chatId());
+                    })
+                    .build();
+   }
+
    // Command /help
    public Ability help() {
       return Ability.builder()
@@ -133,10 +185,22 @@ public class BenderBot extends AbilityBot {
       }, Flag.TEXT, isNotCommand());
    }
 
+   public Reply handleCallbackQuery() {
+      return Reply.of((bot, upd) -> {
+         long chatId = upd.getCallbackQuery().getMessage().getChatId();
+         int messageId = upd.getCallbackQuery().getMessage().getMessageId();
+         String callbackData = upd.getCallbackQuery().getData();
+         String callbackQueryId = upd.getCallbackQuery().getId();
+
+         responseHandler.handleCallbackQuery(chatId, messageId, callbackData, callbackQueryId);
+      }, Flag.CALLBACK_QUERY);
+   }
+
    @Override
    public List<Reply> replies() {
       return List.of(
-            handleUnknownMessage()
+            handleUnknownMessage(),
+            handleCallbackQuery()
       );
    }
 
