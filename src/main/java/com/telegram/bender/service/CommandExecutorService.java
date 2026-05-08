@@ -1,0 +1,90 @@
+package com.telegram.bender.service;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.telegram.bender.dto.SensorsCommandResponseDto;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class CommandExecutorService {
+
+   public String executeFastfetch() {
+      try {
+         Process process = new ProcessBuilder(
+               "fastfetch",
+               "--logo", "none",
+               "--pipe",
+               "--structure", "title:os:host:kernel:uptime:packages:shell:display:de:wm:wmtheme:theme:icons:font:cursor:terminal:terminalfont:cpu:gpu:memory:swap:disk:localip:battery:poweradapter:locale"
+         ).start();
+         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+         }
+      } catch (Exception ex) {
+         return "Error al ejecutar fastfetch: " + ex.getMessage();
+      }
+   }
+
+   public String executeSensors() {
+      try {
+         Process process = new ProcessBuilder("sensors", "-j").start();
+         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String json = reader.lines().collect(Collectors.joining("\n"));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SensorsCommandResponseDto dto = mapper.readValue(json, SensorsCommandResponseDto.class);
+
+            return dto.toString();
+         }
+      } catch (Exception ex) {
+         return "Error al ejecutar fastfetch: " + ex.getMessage();
+      }
+   }
+
+   public boolean processExists(int pid) {
+      try {
+         return new java.io.File("/proc/" + pid).exists();
+      } catch (Exception ex) {
+         log.error("Error al verificar /proc: " + ex.getMessage());
+
+         return false;
+      }
+   }
+
+   public String killProcessSafe(int pid) {
+      if (!processExists(pid)) {
+         return "El proceso " + pid + " no existe";
+      }
+
+      try {
+
+         Process process = new ProcessBuilder("kill", String.valueOf(pid)).start();
+         int exitCode = process.waitFor();
+
+         if (exitCode == 0) {
+            return "Proceso " + pid + " terminado exitosamente";
+         }
+
+         process = new ProcessBuilder("kill", "-9", String.valueOf(pid)).start();
+         exitCode = process.waitFor();
+
+         if (exitCode == 0) {
+            return "Proceso " + pid + " terminado forzosamente";
+         } else {
+            return "No se pudo terminar el proceso " + pid;
+         }
+
+      } catch (Exception ex) {
+         return "Error al ejecutar kill: " + ex.getMessage();
+      }
+   }
+
+}
