@@ -13,7 +13,7 @@ public enum EBotCommand {
    INFO("info", "Consultar información del servidor"),
    TEMPERATURE("temperature", "Consultar temperaturas del servidor"),
    TUNNEL("tunnel", "Listar túneles SSH activos en el servidor"),
-   TURN_OFF_LEDS("turn-off-leds", "Apagar los LEDs del servidor"),
+   TURN_OFF_LEDS("turn_off_leds", "Apagar los LEDs del servidor"),
    REBOOT("reboot", "Reiniciar el servidor"),
    SHUTDOWN("shutdown", "Apagar el servidor"),
    COOLER("cooler", "Configurar la velocidad del cooler"),
