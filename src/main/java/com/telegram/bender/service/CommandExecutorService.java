@@ -42,7 +42,7 @@ public class CommandExecutorService {
             ObjectMapper mapper = new ObjectMapper();
             SensorsCommandResponseDto dto = mapper.readValue(json, SensorsCommandResponseDto.class);
 
-            return dto.toString();
+            return dto.toFormattedString();
          }
       } catch (Exception ex) {
          return "Error al ejecutar fastfetch: " + ex.getMessage();

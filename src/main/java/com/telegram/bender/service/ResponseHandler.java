@@ -62,7 +62,7 @@ public class ResponseHandler {
 
    public void replyToTemperature(long chatId) {
       String response = commandExecutorService.executeSensors();
-      StringBuilder text = new StringBuilder(THERMOMETER_EMOJI + " *Temperaturas del sistema* " + THERMOMETER_EMOJI + "\n\n");
+      StringBuilder text = new StringBuilder(THERMOMETER_EMOJI + " *Temperatura del sistema* " + THERMOMETER_EMOJI + "\n\n");
       text.append(response).append("\n\n");
       text.append("_proporcionado por lm-sensors_");
 

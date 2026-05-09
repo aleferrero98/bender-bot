@@ -11,7 +11,7 @@ public enum EBotCommand {
 
    START("start", "Iniciar el bot y ver el menú principal"),
    INFO("info", "Consultar información del servidor"),
-   TEMPERATURE("temperature", "Consultar temperaturas del servidor"),
+   TEMPERATURE("temperature", "Consultar temperatura del servidor"),
    TUNNEL("tunnel", "Listar túneles SSH activos en el servidor"),
    TURN_OFF_LEDS("turn_off_leds", "Apagar los LEDs del servidor"),
    REBOOT("reboot", "Reiniciar el servidor"),
