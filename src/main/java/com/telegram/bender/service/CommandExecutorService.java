@@ -23,7 +23,7 @@ public class CommandExecutorService {
                "fastfetch",
                "--logo", "none",
                "--pipe",
-               "--structure", "title:os:host:kernel:uptime:packages:shell:display:de:wm:wmtheme:theme:icons:font:cursor:terminal:terminalfont:cpu:gpu:memory:swap:disk:localip:battery:poweradapter:locale"
+               "--structure", "os:host:kernel:uptime:packages:shell:display:de:wm:wmtheme:theme:icons:font:cursor:terminal:terminalfont:cpu:gpu:memory:swap:disk:localip:battery:poweradapter:locale"
          ).start();
          try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             return reader.lines().collect(Collectors.joining("\n"));

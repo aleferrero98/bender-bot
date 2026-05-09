@@ -49,7 +49,7 @@ public class ResponseHandler {
    public void replyToInfo(long chatId) {
       String response = commandExecutorService.executeFastfetch();
       StringBuilder text = new StringBuilder(STATISTICS_EMOJI + " *Información del sistema* " + STATISTICS_EMOJI + "\n\n");
-      text.append(response).append("\n\n");
+      text.append("```\n").append(response).append("\n```\n\n");
       text.append("_proporcionado por Fastfetch_");
 
       SendMessage message = new SendMessage();
@@ -63,7 +63,7 @@ public class ResponseHandler {
    public void replyToTemperature(long chatId) {
       String response = commandExecutorService.executeSensors();
       StringBuilder text = new StringBuilder(THERMOMETER_EMOJI + " *Temperatura del sistema* " + THERMOMETER_EMOJI + "\n\n");
-      text.append(response).append("\n\n");
+      text.append(response).append("\n");
       text.append("_proporcionado por lm-sensors_");
 
       SendMessage message = new SendMessage();
