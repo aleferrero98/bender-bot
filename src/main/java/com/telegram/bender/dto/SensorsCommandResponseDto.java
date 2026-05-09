@@ -50,7 +50,7 @@ public class SensorsCommandResponseDto {
 
    private void appendIfNotNull(StringBuilder sb, String label, ThermalComponentDto dto) {
       if (dto != null && dto.getTemperature() != null) {
-         sb.append(String.format("• **%s**: %.1f°C (🔥 %.0f°C)\n",
+         sb.append(String.format("- *%s*: %.1f°C (🔥 %.0f°C)\n",
                label,
                dto.getTemperature().getTemperatureInput(),
                dto.getTemperature().getTemperatureCritical()));
@@ -59,7 +59,7 @@ public class SensorsCommandResponseDto {
 
    private void appendIfNotNull(StringBuilder sb, String label, ThermalCompositeComponentDto dto) {
       if (dto != null && dto.getCompositeTemperature() != null) {
-         sb.append(String.format("• **%s**: %.1f°C (🔥 %.0f°C)\n",
+         sb.append(String.format("- *%s*: %.1f°C (🔥 %.0f°C)\n",
                label,
                dto.getCompositeTemperature().getTemperatureInput(),
                dto.getCompositeTemperature().getTemperatureCritical()));

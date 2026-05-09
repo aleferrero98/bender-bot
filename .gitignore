@@ -8,6 +8,7 @@ TODO
 .DS_Store
 mysql/data/
 DolarometroBot
+deploy.sh
 
 ### STS ###
 .apt_generated
