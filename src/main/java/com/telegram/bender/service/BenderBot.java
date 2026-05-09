@@ -96,11 +96,11 @@ public class BenderBot extends AbilityBot {
                     .build();
    }
 
-   // Command /turn-off-leds
+   // Command /leds_off
    public Ability turnOffLeds() {
       return Ability.builder()
-                    .name(EBotCommand.TURN_OFF_LEDS.getName())
-                    .info(EBotCommand.TURN_OFF_LEDS.getDescription())
+                    .name(EBotCommand.LEDS_OFF.getName())
+                    .info(EBotCommand.LEDS_OFF.getDescription())
                     .locality(Locality.USER)
                     .privacy(Privacy.CREATOR)
                     .action(ctx -> {
