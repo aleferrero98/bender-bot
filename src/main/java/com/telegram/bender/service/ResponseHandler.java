@@ -138,7 +138,7 @@ public class ResponseHandler {
       StringBuilder helpText = new StringBuilder("🤟🏻 *Comandos disponibles* 🤟🏻\n\n");
 
       for (EBotCommand command : EBotCommand.values()) {
-         helpText.append(String.format("/%s - %s\n", command.getName(), command.getDescription()));
+         helpText.append(String.format("`/%-7s` %s%s\n", command.getName(), command.getEmoji(), command.getDescription()));
       }
 
       SendMessage message = new SendMessage();
