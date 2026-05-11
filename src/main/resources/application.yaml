@@ -1,0 +1,61 @@
+server:
+  port: 7071
+
+spring:
+  application:
+    name: Bender Bot
+    short-io:
+        url: https://api.short.io
+        token: ${SHORT_IO_TOKEN}
+        domain-id: ${SHORT_IO_DOMAIN_ID}
+        link-id:
+          bender: ${SHORT_IO_BENDER_LINK_ID}
+          immich: ${SHORT_IO_IMMICH_LINK_ID}
+          nextcloud: ${SHORT_IO_NEXTCLOUD_LINK_ID}
+          spliit: ${SHORT_IO_SPLIIT_LINK_ID}
+          pingvin-share: ${SHORT_IO_PINGVIN_SHARE_LINK_ID}
+
+#  datasource:
+#    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3301/dolarometro?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Argentina/Cordoba}
+#    username: ${SPRING_DATASOURCE_USERNAME}
+#    password: ${SPRING_DATASOURCE_PASSWORD}
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    hikari:
+#      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
+#      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
+#      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+#      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:600000}
+#      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
+#  jpa:
+#    database-platform: org.hibernate.dialect.MySQLDialect
+#    hibernate:
+#      ddl-auto: validate
+#    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        jdbc:
+#          batch_size: ${SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_BATCH_SIZE:10}
+
+logging:
+  level:
+    com:
+      telegram:
+        bot: ${LOGGING_LEVEL_COM_TELEGRAM_BOT:INFO}
+    org:
+      springframework: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK:WARN}
+      hibernate:
+        SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:DEBUG}
+        type:
+          descriptor:
+            sql:
+              BasicBinder: ${LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER:TRACE}
+
+telegram:
+  bot:
+    username: ${TELEGRAM_BOT_USERNAME}
+    token: ${TELEGRAM_BOT_TOKEN}
+    creator: ${TELEGRAM_BOT_CREATOR}
+
+
+

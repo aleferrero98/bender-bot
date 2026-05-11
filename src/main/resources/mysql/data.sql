@@ -1,0 +1,1 @@
+-- DML statements - Data Manipulation Language (SELECT, INSERT, UPDATE, DELETE)

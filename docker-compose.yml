@@ -1,0 +1,24 @@
+services:
+  bender-bot-db:
+    image: mysql:latest
+    container_name: bender-bot-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=bender_bot
+      - MYSQL_USER=bender
+      - MYSQL_PASSWORD=${MYSQL_USER_PASSWORD}
+    volumes:
+      - bender_bot_db_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3303:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bender_bot_db_data:
+    driver: local
