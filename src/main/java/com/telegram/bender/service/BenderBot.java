@@ -13,8 +13,10 @@ import org.telegram.abilitybots.api.objects.Flag;
 import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.Privacy;
 import org.telegram.abilitybots.api.objects.Reply;
+import org.telegram.abilitybots.api.util.AbilityUtils;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
 import com.telegram.bender.model.EBotCommand;
@@ -78,20 +80,33 @@ public class BenderBot extends AbilityBot {
                     .locality(Locality.USER)
                     .privacy(Privacy.CREATOR)
                     .action(ctx -> {
-                       responseHandler.replyToInfo(ctx.chatId());
+                       responseHandler.replyToInfoMenu(ctx.chatId());
+                    })
+                     .build();
+   }
+
+   // Command /manage
+   public Ability manage() {
+      return Ability.builder()
+                    .name(EBotCommand.MANAGE.getName())
+                    .info(EBotCommand.MANAGE.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToManageMenu(ctx.chatId());
                     })
                     .build();
    }
 
-   // Command /temperature
-   public Ability temperature() {
+   // Command /cooler
+   public Ability cooler() {
       return Ability.builder()
-                    .name(EBotCommand.TEMPERATURE.getName())
-                    .info(EBotCommand.TEMPERATURE.getDescription())
+                    .name(EBotCommand.COOLER.getName())
+                    .info(EBotCommand.COOLER.getDescription())
                     .locality(Locality.USER)
                     .privacy(Privacy.CREATOR)
                     .action(ctx -> {
-                       responseHandler.replyToTemperature(ctx.chatId());
+                       responseHandler.replyToCoolerMenu(ctx.chatId());
                     })
                     .build();
    }
@@ -133,11 +148,36 @@ public class BenderBot extends AbilityBot {
       }, Flag.TEXT, isNotCommand());
    }
 
+   public Reply handleCallbackQuery() {
+      return Reply.of((bot, upd) -> {
+         long chatId = upd.getCallbackQuery().getMessage().getChatId();
+         int messageId = upd.getCallbackQuery().getMessage().getMessageId();
+         String callbackData = upd.getCallbackQuery().getData();
+         String callbackQueryId = upd.getCallbackQuery().getId();
+
+         responseHandler.handleCallbackQuery(chatId, messageId, callbackData, callbackQueryId);
+      }, Flag.CALLBACK_QUERY);
+   }
+
    @Override
    public List<Reply> replies() {
       return List.of(
-            handleUnknownMessage()
+            handleUnknownMessage(),
+            handleCallbackQuery()
       );
+   }
+
+   @Override
+   public void onUpdateReceived(Update update) {
+      User user = AbilityUtils.getUser(update);
+
+      if (!creatorId.equals(user.getId())) {
+         Long chatId = AbilityUtils.getChatId(update);
+         responseHandler.handleUnauthorizedAccess(chatId);
+         return;
+      }
+
+      super.onUpdateReceived(update);
    }
 
 }

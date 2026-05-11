@@ -23,7 +23,7 @@ public class CommandExecutorService {
                "fastfetch",
                "--logo", "none",
                "--pipe",
-               "--structure", "title:os:host:kernel:uptime:packages:shell:display:de:wm:wmtheme:theme:icons:font:cursor:terminal:terminalfont:cpu:gpu:memory:swap:disk:localip:battery:poweradapter:locale"
+               "--structure", "os:host:kernel:uptime:packages:shell:display:de:wm:wmtheme:theme:icons:font:cursor:terminal:terminalfont:cpu:gpu:memory:swap:disk:localip:battery:poweradapter:locale"
          ).start();
          try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             return reader.lines().collect(Collectors.joining("\n"));
@@ -42,7 +42,7 @@ public class CommandExecutorService {
             ObjectMapper mapper = new ObjectMapper();
             SensorsCommandResponseDto dto = mapper.readValue(json, SensorsCommandResponseDto.class);
 
-            return dto.toString();
+            return dto.toFormattedString();
          }
       } catch (Exception ex) {
          return "Error al ejecutar fastfetch: " + ex.getMessage();
@@ -84,6 +84,76 @@ public class CommandExecutorService {
 
       } catch (Exception ex) {
          return "Error al ejecutar kill: " + ex.getMessage();
+      }
+   }
+
+   public boolean executeTurnOffLeds() {
+      try {
+         Process process = new ProcessBuilder("sudo", "turn-off-leds").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al ejecutar turn-off-leds: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean executeReboot() {
+      try {
+         Process process = new ProcessBuilder("sudo", "reboot", "now").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al ejecutar reboot: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean executeShutdown() {
+      try {
+         Process process = new ProcessBuilder("sudo", "shutdown", "now").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al ejecutar shutdown: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean setCoolerSpeed(int speed) {
+      try {
+         Process process = new ProcessBuilder("sudo", "fan", String.valueOf(speed)).start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al setear velocidad del cooler: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean enableTempController() {
+      try {
+         Process process = new ProcessBuilder("sudo", "systemctl", "start", "temperature_controller.service").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al iniciar temperature_controller: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean disableTempController() {
+      try {
+         Process process = new ProcessBuilder("sudo", "systemctl", "stop", "temperature_controller.service").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al deshabilitar temperature_controller: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean isTempControllerRunning() {
+      try {
+         Process process = new ProcessBuilder("sudo", "systemctl", "is-active", "temperature_controller.service").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al verificar estado de temperature_controller: {}", ex.getMessage());
+         return false;
       }
    }
 

@@ -1,5 +1,5 @@
 server:
-  port: 7070
+  port: 7071
 
 spring:
   application:
@@ -13,7 +13,7 @@ spring:
           immich: ${SHORT_IO_IMMICH_LINK_ID}
           nextcloud: ${SHORT_IO_NEXTCLOUD_LINK_ID}
           spliit: ${SHORT_IO_SPLIIT_LINK_ID}
-          pingvin: ${SHORT_IO_PINGVIN_SHARE_LINK_ID}
+          pingvin-share: ${SHORT_IO_PINGVIN_SHARE_LINK_ID}
 
 #  datasource:
 #    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3301/dolarometro?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Argentina/Cordoba}
