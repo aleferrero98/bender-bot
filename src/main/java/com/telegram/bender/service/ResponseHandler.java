@@ -162,17 +162,12 @@ public class ResponseHandler {
       setSpeedButton.setText("🎛️ Setear Velocidad");
       setSpeedButton.setCallbackData("cooler_set_speed");
 
-      InlineKeyboardButton tempControllerStartButton = new InlineKeyboardButton();
-      tempControllerStartButton.setText("🌡️ Habilitar Temperature Controller");
-      tempControllerStartButton.setCallbackData("cooler_temp_controller_start");
-
-      InlineKeyboardButton tempControllerStopButton = new InlineKeyboardButton();
-      tempControllerStopButton.setText("🌡️ Deshabilitar Temperature Controller");
-      tempControllerStopButton.setCallbackData("cooler_temp_controller_stop");
+      InlineKeyboardButton tempControllerButton = new InlineKeyboardButton();
+      tempControllerButton.setText("🌡️ Temperature Controller");
+      tempControllerButton.setCallbackData("cooler_temp_controller");
 
       keyboard.add(List.of(setSpeedButton));
-      keyboard.add(List.of(tempControllerStartButton));
-      keyboard.add(List.of(tempControllerStopButton));
+      keyboard.add(List.of(tempControllerButton));
       markup.setKeyboard(keyboard);
       message.setReplyMarkup(markup);
 
@@ -226,6 +221,10 @@ public class ResponseHandler {
          case "cooler_set_speed":
             answerCallbackQuery(callbackQueryId);
             replyToCoolerSpeedSelection(chatId, messageId);
+            break;
+         case "cooler_temp_controller":
+            answerCallbackQuery(callbackQueryId);
+            replyToTempControllerStatus(chatId);
             break;
          case "cooler_temp_controller_start":
             answerCallbackQuery(callbackQueryId);
@@ -317,9 +316,43 @@ public class ResponseHandler {
       sender.execute(message);
    }
 
+   private void replyToTempControllerStatus(long chatId) {
+      boolean isRunning = commandExecutorService.isTempControllerRunning();
+
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+
+      StringBuilder text = new StringBuilder();
+      text.append("🌡️ **Temperature Controller**\n\n");
+      if (isRunning) {
+         text.append("Estado: **Activo** 🟢");
+      } else {
+         text.append("Estado: **Inactivo** 🔴");
+      }
+      message.setText(text.toString());
+      message.setParseMode(MARKDOWN);
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton actionButton = new InlineKeyboardButton();
+      if (isRunning) {
+         actionButton.setText("❌ Deshabilitar");
+         actionButton.setCallbackData("cooler_temp_controller_stop");
+      } else {
+         actionButton.setText("✅ Habilitar");
+         actionButton.setCallbackData("cooler_temp_controller_start");
+      }
+
+      keyboard.add(List.of(actionButton));
+      markup.setKeyboard(keyboard);
+      message.setReplyMarkup(markup);
+
+      sender.execute(message);
+   }
+
    private void handleTempControllerStart(long chatId) {
       boolean success = commandExecutorService.enableTempController();
-
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
 
@@ -334,7 +367,6 @@ public class ResponseHandler {
 
    private void handleTempControllerStop(long chatId) {
       boolean success = commandExecutorService.disableTempController();
-
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
 

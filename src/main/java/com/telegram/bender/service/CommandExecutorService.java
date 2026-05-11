@@ -147,4 +147,14 @@ public class CommandExecutorService {
       }
    }
 
+   public boolean isTempControllerRunning() {
+      try {
+         Process process = new ProcessBuilder("sudo", "systemctl", "is-active", "temperature_controller.service").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error al verificar estado de temperature_controller: {}", ex.getMessage());
+         return false;
+      }
+   }
+
 }
