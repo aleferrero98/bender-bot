@@ -66,6 +66,30 @@ public class ResponseHandler {
       sender.execute(message);
    }
 
+   public void replyToInfoMenu(long chatId) {
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("Selecciona una opción:");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton infoButton = new InlineKeyboardButton();
+      infoButton.setText("📊 Información del sistema");
+      infoButton.setCallbackData("info_system");
+
+      InlineKeyboardButton tempButton = new InlineKeyboardButton();
+      tempButton.setText("🌡️ Temperatura del sistema");
+      tempButton.setCallbackData("info_temperature");
+
+      keyboard.add(List.of(infoButton));
+      keyboard.add(List.of(tempButton));
+      markup.setKeyboard(keyboard);
+      message.setReplyMarkup(markup);
+
+      sender.execute(message);
+   }
+
    public void handleUnknownMessage(long chatId) {
       SendMessage sendMessage = new SendMessage();
       sendMessage.setChatId(chatId);
@@ -216,6 +240,14 @@ public class ResponseHandler {
          case "confirm_shutdown":
             answerCallbackQuery(callbackQueryId);
             sendShutdownRequestMessage(chatId);
+            break;
+         case "info_system":
+            answerCallbackQuery(callbackQueryId);
+            replyToInfo(chatId);
+            break;
+         case "info_temperature":
+            answerCallbackQuery(callbackQueryId);
+            replyToTemperature(chatId);
             break;
          case "cooler_set_speed":
             answerCallbackQuery(callbackQueryId);

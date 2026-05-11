@@ -80,20 +80,7 @@ public class BenderBot extends AbilityBot {
                     .locality(Locality.USER)
                     .privacy(Privacy.CREATOR)
                     .action(ctx -> {
-                       responseHandler.replyToInfo(ctx.chatId());
-                    })
-                    .build();
-   }
-
-   // Command /temperature
-   public Ability temperature() {
-      return Ability.builder()
-                    .name(EBotCommand.TEMPERATURE.getName())
-                    .info(EBotCommand.TEMPERATURE.getDescription())
-                    .locality(Locality.USER)
-                    .privacy(Privacy.CREATOR)
-                    .action(ctx -> {
-                       responseHandler.replyToTemperature(ctx.chatId());
+                       responseHandler.replyToInfoMenu(ctx.chatId());
                     })
                     .build();
    }

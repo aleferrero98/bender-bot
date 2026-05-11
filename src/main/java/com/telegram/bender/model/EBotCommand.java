@@ -10,8 +10,7 @@ import lombok.Getter;
 public enum EBotCommand {
 
    START("start", "Iniciar el bot y ver el menú principal"),
-   INFO("info", "Consultar información del servidor"),
-   TEMPERATURE("temperature", "Consultar temperatura del servidor"),
+   INFO("info", "Consultar información y temperatura del servidor"),
    COOLER("cooler", "Configurar la velocidad del cooler"),
    TUNNEL("tunnel", "Listar túneles SSH activos en el servidor"),
    LEDS_OFF("leds_off", "Apagar los LEDs del servidor"),
