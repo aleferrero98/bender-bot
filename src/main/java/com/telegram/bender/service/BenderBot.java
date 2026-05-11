@@ -13,8 +13,10 @@ import org.telegram.abilitybots.api.objects.Flag;
 import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.Privacy;
 import org.telegram.abilitybots.api.objects.Reply;
+import org.telegram.abilitybots.api.util.AbilityUtils;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
 import com.telegram.bender.model.EBotCommand;
@@ -202,6 +204,19 @@ public class BenderBot extends AbilityBot {
             handleUnknownMessage(),
             handleCallbackQuery()
       );
+   }
+
+   @Override
+   public void onUpdateReceived(Update update) {
+      User user = AbilityUtils.getUser(update);
+
+      if (!creatorId.equals(user.getId())) {
+         Long chatId = AbilityUtils.getChatId(update);
+         responseHandler.handleUnauthorizedAccess(chatId);
+         return;
+      }
+
+      super.onUpdateReceived(update);
    }
 
 }
