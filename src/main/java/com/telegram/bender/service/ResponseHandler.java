@@ -105,6 +105,35 @@ public class ResponseHandler {
       sender.execute(message);
    }
 
+   public void replyToManageMenu(long chatId) {
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("Seleccioná una opción:");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton rebootButton = new InlineKeyboardButton();
+      rebootButton.setText("🔄 Reiniciar servidor");
+      rebootButton.setCallbackData("reboot");
+
+      InlineKeyboardButton shutdownButton = new InlineKeyboardButton();
+      shutdownButton.setText("⏻ Apagar servidor");
+      shutdownButton.setCallbackData("shutdown");
+
+      InlineKeyboardButton ledsButton = new InlineKeyboardButton();
+      ledsButton.setText("💡 Apagar LEDs");
+      ledsButton.setCallbackData("turn_off_leds");
+
+      keyboard.add(List.of(rebootButton));
+      keyboard.add(List.of(shutdownButton));
+      keyboard.add(List.of(ledsButton));
+      markup.setKeyboard(keyboard);
+      message.setReplyMarkup(markup);
+
+      sender.execute(message);
+   }
+
    public void replyToHelp(long chatId) {
       StringBuilder helpText = new StringBuilder("🤟🏻 *Comandos disponibles* 🤟🏻\n\n");
 
@@ -240,6 +269,18 @@ public class ResponseHandler {
          case "confirm_shutdown":
             answerCallbackQuery(callbackQueryId);
             sendShutdownRequestMessage(chatId);
+            break;
+         case "reboot":
+            answerCallbackQuery(callbackQueryId);
+            replyToRebootConfirmation(chatId);
+            break;
+         case "shutdown":
+            answerCallbackQuery(callbackQueryId);
+            replyToShutdownConfirmation(chatId);
+            break;
+         case "turn_off_leds":
+            answerCallbackQuery(callbackQueryId);
+            replyToTurnOffLeds(chatId);
             break;
          case "info_system":
             answerCallbackQuery(callbackQueryId);

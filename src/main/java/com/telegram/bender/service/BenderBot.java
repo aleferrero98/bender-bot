@@ -82,44 +82,18 @@ public class BenderBot extends AbilityBot {
                     .action(ctx -> {
                        responseHandler.replyToInfoMenu(ctx.chatId());
                     })
-                    .build();
+                     .build();
    }
 
-   // Command /leds_off
-   public Ability turnOffLeds() {
+   // Command /manage
+   public Ability manage() {
       return Ability.builder()
-                    .name(EBotCommand.LEDS_OFF.getName())
-                    .info(EBotCommand.LEDS_OFF.getDescription())
+                    .name(EBotCommand.MANAGE.getName())
+                    .info(EBotCommand.MANAGE.getDescription())
                     .locality(Locality.USER)
                     .privacy(Privacy.CREATOR)
                     .action(ctx -> {
-                       responseHandler.replyToTurnOffLeds(ctx.chatId());
-                    })
-                    .build();
-   }
-
-   // Command /reboot
-   public Ability reboot() {
-      return Ability.builder()
-                    .name(EBotCommand.REBOOT.getName())
-                    .info(EBotCommand.REBOOT.getDescription())
-                    .locality(Locality.USER)
-                    .privacy(Privacy.CREATOR)
-                    .action(ctx -> {
-                       responseHandler.replyToRebootConfirmation(ctx.chatId());
-                    })
-                    .build();
-   }
-
-   // Command /shutdown
-   public Ability shutdown() {
-      return Ability.builder()
-                    .name(EBotCommand.SHUTDOWN.getName())
-                    .info(EBotCommand.SHUTDOWN.getDescription())
-                    .locality(Locality.USER)
-                    .privacy(Privacy.CREATOR)
-                    .action(ctx -> {
-                       responseHandler.replyToShutdownConfirmation(ctx.chatId());
+                       responseHandler.replyToManageMenu(ctx.chatId());
                     })
                     .build();
    }
