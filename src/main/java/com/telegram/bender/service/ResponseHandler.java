@@ -116,7 +116,7 @@ public class ResponseHandler {
    public void replyToManageMenu(long chatId) {
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
-      message.setText("Seleccioná una opción:");
+      message.setText("Selecciona una opción:");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -418,7 +418,7 @@ public class ResponseHandler {
       message.setChatId(chatId);
 
       if (success) {
-         message.setText("✅ Cooler seteado al **" + speed + "%**");
+         message.setText("✅ Cooler seteado al *" + speed + "%*");
          message.setParseMode(MARKDOWN);
       } else {
          message.setText("❌ No se pudo setear la velocidad del cooler");
@@ -434,7 +434,7 @@ public class ResponseHandler {
       message.setChatId(chatId);
 
       StringBuilder text = new StringBuilder();
-      text.append("🌡️ **Temperature Controller**\n\n");
+      text.append("🌡️ *Temperature Controller*\n\n");
       if (isRunning) {
          text.append("Estado: *Activo* 🟢");
       } else {
@@ -493,7 +493,7 @@ public class ResponseHandler {
    public void replyToTunnelMenu(long chatId) {
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
-      message.setText("🔗 **Túneles SSH**\n\nSeleccioná una opción:");
+      message.setText("🔗 *Túneles SSH*\n\nSelecciona una opción:");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -507,7 +507,7 @@ public class ResponseHandler {
       createButton.setCallbackData("tunnel_create");
 
       InlineKeyboardButton frequentButton = new InlineKeyboardButton();
-      frequentButton.setText("⚡ Levantar servicio frecuente");
+      frequentButton.setText("⚡ Levantar app frecuente");
       frequentButton.setCallbackData("tunnel_frequent");
 
       keyboard.add(List.of(listButton));
@@ -531,12 +531,12 @@ public class ResponseHandler {
          return;
       }
 
-      StringBuilder text = new StringBuilder("📋 **Túneles activos**\n\n");
+      StringBuilder text = new StringBuilder("📋 *Túneles activos*\n\n");
       for (TunnelEntity tunnel : activeTunnels) {
-         text.append(String.format("🔹 **ID:** %d\n", tunnel.getId()));
-         text.append(String.format("   🌐 **URL:** %s\n", tunnel.getUrl()));
-         text.append(String.format("   🔌 **Puerto:** %d\n", tunnel.getExposedPort()));
-         text.append(String.format("   ⏰ **Expira:** %s\n\n", tunnel.getExpiresAt().format(DATE_FORMATTER)));
+         text.append(String.format("🔹 *ID:* %d\n", tunnel.getId()));
+         text.append(String.format("   🌐 *URL:* %s\n", tunnel.getUrl()));
+         text.append(String.format("   🔌 *Puerto:* %d\n", tunnel.getExposedPort()));
+         text.append(String.format("   ⏰ *Expira:* %s\n\n", tunnel.getExpiresAt().format(DATE_FORMATTER)));
       }
 
       SendMessage message = new SendMessage();
@@ -587,7 +587,7 @@ public class ResponseHandler {
       EditMessageText editMessage = new EditMessageText();
       editMessage.setChatId(chatId);
       editMessage.setMessageId(messageId);
-      editMessage.setText("🔌 Seleccioná el puerto a exponer:");
+      editMessage.setText("🔌 Selecciona el puerto a exponer:");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -631,7 +631,7 @@ public class ResponseHandler {
       EditMessageText editMessage = new EditMessageText();
       editMessage.setChatId(chatId);
       editMessage.setMessageId(messageId);
-      editMessage.setText("⏰ Seleccioná el período disponible para el puerto " + port + ":");
+      editMessage.setText("⏰ Selecciona el período disponible para el puerto " + port + ":");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -679,10 +679,10 @@ public class ResponseHandler {
       editMessage.setChatId(chatId);
       editMessage.setMessageId(messageId);
       editMessage.setText(String.format(
-            "📋 **Resumen del túnel**\n\n" +
-            "🔌 **Puerto:** %d\n" +
-            "⏰ **Duración:** %s\n" +
-            "☁️ **Proveedor:** Cloudflare\n\n" +
+            "📋 *Resumen del túnel*\n\n" +
+            "🔌 *Puerto:* %d\n" +
+            "⏰ *Duración:* %s\n" +
+            "☁️ *Proveedor:* Cloudflare\n\n" +
             "¿Confirmás la creación del túnel?",
             port, durationText
       ));
@@ -724,12 +724,12 @@ public class ResponseHandler {
          SendMessage message = new SendMessage();
          message.setChatId(chatId);
          message.setText(String.format(
-               "✅ **Túnel creado exitosamente**\n\n" +
-               "🆔 **ID:** %d\n" +
-               "🌐 **URL:** %s\n" +
-               "🔌 **Puerto:** %d\n" +
-               "⏰ **Expira:** %s\n" +
-               "☁️ **Proveedor:** Cloudflare",
+               "✅ *Túnel creado exitosamente*\n\n" +
+               "🆔 *ID:* %d\n" +
+               "🌐 *URL:* %s\n" +
+               "🔌 *Puerto:* %d\n" +
+               "⏰ *Expira:* %s\n" +
+               "☁️ *Proveedor:* Cloudflare",
                tunnel.getId(), tunnel.getUrl(), tunnel.getExposedPort(),
                tunnel.getExpiresAt().format(DATE_FORMATTER)
          ));
@@ -747,7 +747,7 @@ public class ResponseHandler {
       EditMessageText editMessage = new EditMessageText();
       editMessage.setChatId(chatId);
       editMessage.setMessageId(messageId);
-      editMessage.setText("⚡ Seleccioná la app frecuente:");
+      editMessage.setText("⚡ Selecciona la app frecuente:");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -780,7 +780,7 @@ public class ResponseHandler {
       EditMessageText editMessage = new EditMessageText();
       editMessage.setChatId(chatId);
       editMessage.setMessageId(messageId);
-      editMessage.setText("⏰ Seleccioná el período disponible para " + serviceName + ":");
+      editMessage.setText("⏰ Selecciona el período disponible para " + serviceName + ":");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -823,12 +823,12 @@ public class ResponseHandler {
       editMessage.setChatId(chatId);
       editMessage.setMessageId(messageId);
       editMessage.setText(String.format(
-            "📋 **Resumen de la app frecuente**\n\n" +
-            "⚡ **App:** %s\n" +
-            "🔌 **Puerto:** %d\n" +
-            "⏰ **Duración:** %s\n" +
-            "🔗 **URL corta:** %s\n" +
-            "☁️ **Proveedor:** Cloudflare\n\n" +
+            "📋 *Resumen de la app frecuente*\n\n" +
+            "⚡ *App:* %s\n" +
+            "🔌 *Puerto:* %d\n" +
+            "⏰ *Duración:* %s\n" +
+            "🔗 *URL corta:* %s\n" +
+            "☁️ *Proveedor:* Cloudflare\n\n" +
             "¿Confirmás la creación del túnel?",
             serviceName, app.getPort(), durationText, app.getShortIoUrl()
       ));
@@ -872,13 +872,13 @@ public class ResponseHandler {
          SendMessage message = new SendMessage();
          message.setChatId(chatId);
          message.setText(String.format(
-               "✅ **Túnel creado exitosamente**\n\n" +
-               "🆔 **ID:** %d\n" +
-               "🌐 **URL:** %s\n" +
-               "🔗 **URL corta:** %s\n" +
-               "🔌 **Puerto:** %d\n" +
-               "⏰ **Expira:** %s\n" +
-               "☁️ **Proveedor:** Cloudflare",
+               "✅ *Túnel creado exitosamente*\n\n" +
+               "🆔 *ID:* %d\n" +
+               "🌐 *URL:* %s\n" +
+               "🔗 *URL corta:* %s\n" +
+               "🔌 *Puerto:* %d\n" +
+               "⏰ *Expira:* %s\n" +
+               "☁️ *Proveedor:* Cloudflare",
                tunnel.getId(), tunnel.getUrl(), app.getShortIoUrl(),
                tunnel.getExposedPort(), tunnel.getExpiresAt().format(DATE_FORMATTER)
          ));
