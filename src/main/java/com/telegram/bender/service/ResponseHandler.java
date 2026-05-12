@@ -138,7 +138,7 @@ public class ResponseHandler {
       StringBuilder helpText = new StringBuilder("🤟🏻 *Comandos disponibles* 🤟🏻\n\n");
 
       for (EBotCommand command : EBotCommand.values()) {
-         helpText.append(String.format("`/%-7s` %s%s\n", command.getName(), command.getEmoji(), command.getDescription()));
+         helpText.append(String.format("%s /%s - %s\n", command.getEmoji(), command.getName(), command.getDescription()));
       }
 
       SendMessage message = new SendMessage();
@@ -397,9 +397,9 @@ public class ResponseHandler {
       StringBuilder text = new StringBuilder();
       text.append("🌡️ **Temperature Controller**\n\n");
       if (isRunning) {
-         text.append("Estado: _Activo_ 🟢");
+         text.append("Estado: *Activo* 🟢");
       } else {
-         text.append("Estado: _Inactivo_ 🔴");
+         text.append("Estado: *Inactivo* 🔴");
       }
       message.setText(text.toString());
       message.setParseMode(MARKDOWN);
