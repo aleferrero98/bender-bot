@@ -40,7 +40,7 @@ public class ResponseHandler {
       this.awaitingCustomPort = new ConcurrentHashMap<>();
    }
 
-   public void replyToStart(long chatId) { // TODO agregar mensaje de bienvenida con comandos posibles y funcionalidades
+   public void replyToStart(long chatId) { // TODO add welcome message with available commands and features
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
       message.setText("Hola soy Bender! 🤖");
