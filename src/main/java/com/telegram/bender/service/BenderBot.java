@@ -32,10 +32,11 @@ public class BenderBot extends AbilityBot {
    private final ResponseHandler responseHandler;
 
    public BenderBot(@Value("${telegram.bot.token}") String botToken,
-         @Value("${telegram.bot.username}") String botUsername, @Value("${telegram.bot.creator}") Long creatorId) {
+         @Value("${telegram.bot.username}") String botUsername, @Value("${telegram.bot.creator}") Long creatorId,
+         TunnelService tunnelService, FrequentAppService frequentAppService) {
       super(botToken, botUsername);
       this.creatorId = creatorId;
-      this.responseHandler = new ResponseHandler(silent, db);
+      this.responseHandler = new ResponseHandler(silent, db, tunnelService, frequentAppService);
       this.registerBotCommands();
    }
 
@@ -120,6 +121,19 @@ public class BenderBot extends AbilityBot {
                     .privacy(Privacy.CREATOR)
                     .action(ctx -> {
                        responseHandler.replyToHelp(ctx.chatId());
+                    })
+                    .build();
+   }
+
+   // Command /tunnel
+   public Ability tunnel() {
+      return Ability.builder()
+                    .name(EBotCommand.TUNNEL.getName())
+                    .info(EBotCommand.TUNNEL.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToTunnelMenu(ctx.chatId());
                     })
                     .build();
    }

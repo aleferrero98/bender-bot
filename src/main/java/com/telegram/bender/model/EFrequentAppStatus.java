@@ -1,6 +1,6 @@
 package com.telegram.bender.model;
 
-public enum EFrequentServiceStatus {
+public enum EFrequentAppStatus {
    ENABLED,
    DISABLED
 }

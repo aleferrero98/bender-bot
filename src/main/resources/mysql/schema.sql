@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `tunnel` (
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `frequent_service` (
+CREATE TABLE IF NOT EXISTS `frequent_app` (
     `id` int unsigned NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(64) NOT NULL,
     `port` int NOT NULL,

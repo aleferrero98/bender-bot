@@ -21,12 +21,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "frequent_service")
+@Table(name = "frequent_app")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FrequentServiceEntity {
+public class FrequentAppEntity {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +47,7 @@ public class FrequentServiceEntity {
    @Enumerated(EnumType.STRING)
    @Column(nullable = false, columnDefinition = "ENUM('ENABLED','DISABLED') DEFAULT 'ENABLED'")
    @Builder.Default
-   private EFrequentServiceStatus status = EFrequentServiceStatus.ENABLED;
+   private EFrequentAppStatus status = EFrequentAppStatus.ENABLED;
 
    @ManyToOne(fetch = FetchType.LAZY)
    @JoinColumn(name = "tunnel_id")
