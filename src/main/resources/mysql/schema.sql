@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `tunnel` (
     `id` int unsigned NOT NULL AUTO_INCREMENT,
     `url` VARCHAR(256) NOT NULL,
     `exposed_port` int NOT NULL,
-    `status` ENUM('ACTIVE','CANCELLED','EXPIRED') NOT NULL DEFAULT 'ACTIVE',
+    `status` ENUM('ACTIVE','CANCELLED','EXPIRED','ERROR') NOT NULL DEFAULT 'ACTIVE',
     `expires_at` DATETIME NOT NULL,
     `process_id` int NOT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

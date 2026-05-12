@@ -25,18 +25,18 @@ public class FrequentAppService {
 
    @Cacheable(CACHE_NAME)
    public List<FrequentAppEntity> getEnabledApps() {
-      log.debug("Consultando apps frecuentes habilitados en DB");
+      log.debug("Fetching enabled frequent apps from DB");
       return frequentAppRepository.findByStatus(EFrequentAppStatus.ENABLED);
    }
 
-   @Scheduled(fixedRate = 300000)
+   @Scheduled(fixedRate = 300000) // Every 5 minutes
    @CacheEvict(value = CACHE_NAME, allEntries = true)
    public void evictCache() {
-      log.debug("Cache de apps frecuentes invalidada");
+      log.debug("Frequent apps cache evicted");
    }
 
    public FrequentAppEntity getByName(String name) {
       return frequentAppRepository.findByName(name)
-            .orElseThrow(() -> new RuntimeException("App frecuente no encontrada: " + name));
+            .orElseThrow(() -> new RuntimeException("Frequent app not found: " + name));
    }
 }

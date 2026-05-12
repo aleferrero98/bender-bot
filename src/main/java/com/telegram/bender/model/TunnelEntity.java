@@ -36,7 +36,7 @@ public class TunnelEntity {
    private Integer exposedPort;
 
    @Enumerated(EnumType.STRING)
-   @Column(nullable = false, columnDefinition = "ENUM('ACTIVE','CANCELLED','EXPIRED') DEFAULT 'ACTIVE'")
+   @Column(nullable = false, columnDefinition = "ENUM('ACTIVE','CANCELLED','EXPIRED','ERROR') DEFAULT 'ACTIVE'")
    @Builder.Default
    private ETunnelStatus status = ETunnelStatus.ACTIVE;
 

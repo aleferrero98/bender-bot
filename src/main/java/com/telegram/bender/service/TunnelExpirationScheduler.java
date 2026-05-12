@@ -16,7 +16,7 @@ public class TunnelExpirationScheduler {
    // Every 10 min
    @Scheduled(fixedRate = 600000)
    public void expireTunnels() {
-      log.info("Ejecutando expiración de túneles...");
+      log.info("Running tunnel expiration check...");
       tunnelService.expireTunnels();
    }
 }
