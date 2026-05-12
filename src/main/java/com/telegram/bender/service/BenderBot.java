@@ -158,7 +158,11 @@ public class BenderBot extends AbilityBot {
    public Reply handleUnknownMessage() {
       return Reply.of((bot, upd) -> {
          long chatId = upd.getMessage().getChatId();
-         responseHandler.handleUnknownMessage(chatId);
+         if (responseHandler.isAwaitingCustomPort(chatId)) {
+            responseHandler.handleCustomPortInput(chatId, upd.getMessage().getText());
+         } else {
+            responseHandler.handleUnknownMessage(chatId);
+         }
       }, Flag.TEXT, isNotCommand());
    }
 

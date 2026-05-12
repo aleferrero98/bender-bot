@@ -16,33 +16,13 @@ public class ShortIoClient {
 
    private static final String UPDATE_SHORT_URL = "/links/%s?domain_id=%d";
 
-   private final String baseUrl;
-   private final String token;
    private final Long domainId;
-   private final String benderLinkId;
-   private final String immichLinkId;
-   private final String nextcloudLinkId;
-   private final String spliitLinkId;
-   private final String pingvinShareLinkId;
    private final WebClient webClient;
 
    public ShortIoClient(@Value("${spring.application.short-io.url}") String baseUrl,
          @Value("${spring.application.short-io.token}") String token,
-         @Value("${spring.application.short-io.domain-id}") Long domainId,
-         @Value("${spring.application.short-io.link-id.bender}") String benderLinkId,
-         @Value("${spring.application.short-io.link-id.immich}") String immichLinkId,
-         @Value("${spring.application.short-io.link-id.nextcloud}") String nextcloudLinkId,
-         @Value("${spring.application.short-io.link-id.spliit}") String spliitLinkId,
-         @Value("${spring.application.short-io.link-id.pingvin-share}") String pingvinShareLinkId) {
-      this.baseUrl = baseUrl;
-      this.token = token;
+         @Value("${spring.application.short-io.domain-id}") Long domainId) {
       this.domainId = domainId;
-      this.benderLinkId = benderLinkId;
-      this.immichLinkId = immichLinkId;
-      this.nextcloudLinkId = nextcloudLinkId;
-      this.spliitLinkId = spliitLinkId;
-      this.pingvinShareLinkId = pingvinShareLinkId;
-
       this.webClient = WebClient
             .builder()
             .baseUrl(baseUrl)

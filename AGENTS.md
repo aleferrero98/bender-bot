@@ -33,6 +33,12 @@ The `ETunnelStatus` enum has the following values:
 - Port: 3303 (mapped from container's 3306)
 - Tables: `tunnel`, `frequent_app`
 
+## Telegram Markdown Formatting
+
+- **Bold**: Enclose text with single `*` (e.g., `*bold text*`)
+- **Italic**: Enclose text with single `_` (e.g., `_italic text_`)
+- Do NOT use double `**` for bold — Telegram does not support it
+
 ## Cache Configuration
 
 - `FrequentAppService` uses Spring Cache with `@Cacheable` and `@CacheEvict`

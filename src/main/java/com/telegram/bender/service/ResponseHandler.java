@@ -3,6 +3,8 @@ package com.telegram.bender.service;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.sender.SilentSender;
@@ -20,12 +22,13 @@ public class ResponseHandler {
 
    private static final String MARKDOWN = "Markdown";
    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+   private static final int MIN_PORT = 0;
+   private static final int MAX_PORT = 65535;
 
    private final CommandExecutorService commandExecutorService;
    private final TunnelService tunnelService;
    private final FrequentAppService frequentAppService;
-
-   // private final Map<Long, EUserStatus> chatStatus;
+   private final Map<Long, String> awaitingCustomPort;
 
    private final SilentSender sender;
 
@@ -34,7 +37,7 @@ public class ResponseHandler {
       this.commandExecutorService = new CommandExecutorService();
       this.tunnelService = tunnelService;
       this.frequentAppService = frequentAppService;
-      // this.chatStatus = db.getMap("chatStatus");
+      this.awaitingCustomPort = new ConcurrentHashMap<>();
    }
 
    public void replyToStart(long chatId) { // TODO agregar mensaje de bienvenida con comandos posibles y funcionalidades
@@ -354,10 +357,12 @@ public class ResponseHandler {
             answerCallbackQuery(callbackQueryId);
              replyToTunnelFrequentAppSelection(chatId, messageId);
             break;
-         default:
+          default:
             answerCallbackQuery(callbackQueryId);
             if (callbackData.startsWith("tunnel_cancel_")) {
                handleTunnelCancel(chatId, callbackData, callbackQueryId);
+            } else if (callbackData.equals("tunnel_create_port_custom")) {
+               replyToTunnelCreateCustomPort(chatId, messageId);
             } else if (callbackData.startsWith("tunnel_create_port_")) {
                handleTunnelCreatePortSelection(chatId, messageId, callbackData);
             } else if (callbackData.startsWith("tunnel_create_duration_")) {
@@ -598,9 +603,7 @@ public class ResponseHandler {
       row1.add(createPortButton("443 (HTTPS)", "tunnel_create_port_443"));
 
       List<InlineKeyboardButton> row2 = new ArrayList<>();
-      row2.add(createPortButton("3000", "tunnel_create_port_3000"));
-      row2.add(createPortButton("8080", "tunnel_create_port_8080"));
-      row2.add(createPortButton("8443", "tunnel_create_port_8443"));
+      row2.add(createPortButton("✏️ Otro", "tunnel_create_port_custom"));
 
       List<InlineKeyboardButton> row3 = new ArrayList<>();
       row3.add(createPortButton("🔙 Volver", "tunnel_menu"));
@@ -627,12 +630,77 @@ public class ResponseHandler {
       replyToTunnelCreateDurationSelection(chatId, messageId, port);
    }
 
-   private void replyToTunnelCreateDurationSelection(long chatId, int messageId, int port) {
+   private void replyToTunnelCreateCustomPort(long chatId, int messageId) {
+      awaitingCustomPort.put(chatId, "tunnel_create");
+
       EditMessageText editMessage = new EditMessageText();
       editMessage.setChatId(chatId);
       editMessage.setMessageId(messageId);
-      editMessage.setText("⏰ Selecciona el período disponible para el puerto " + port + ":");
+      editMessage.setText("✏️ Ingresa el número de puerto (0-65535):");
 
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+      cancelButton.setText("🔙 Cancelar");
+      cancelButton.setCallbackData("tunnel_menu");
+      keyboard.add(List.of(cancelButton));
+
+      markup.setKeyboard(keyboard);
+      editMessage.setReplyMarkup(markup);
+
+      sender.execute(editMessage);
+   }
+
+   public boolean isAwaitingCustomPort(long chatId) {
+      return awaitingCustomPort.containsKey(chatId);
+   }
+
+   public void handleCustomPortInput(long chatId, String input) {
+      String action = awaitingCustomPort.remove(chatId);
+      if (action == null) {
+         return;
+      }
+
+      try {
+         int port = Integer.parseInt(input.trim());
+         if (port < MIN_PORT || port > MAX_PORT) {
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            message.setText("❌ Puerto inválido. Debe estar entre 0 y 65535.");
+            sender.execute(message);
+            return;
+         }
+         replyToTunnelCreateDurationSelection(chatId, 0, port);
+      } catch (NumberFormatException e) {
+         SendMessage message = new SendMessage();
+         message.setChatId(chatId);
+         message.setText("❌ Puerto inválido. Debe ser un número entero.");
+         sender.execute(message);
+      }
+   }
+
+   private void replyToTunnelCreateDurationSelection(long chatId, int messageId, int port) {
+      String text = "⏰ Selecciona el período disponible para el puerto " + port + ":";
+      InlineKeyboardMarkup markup = buildCreateDurationKeyboard(port);
+
+      if (messageId > 0) {
+         EditMessageText editMessage = new EditMessageText();
+         editMessage.setChatId(chatId);
+         editMessage.setMessageId(messageId);
+         editMessage.setText(text);
+         editMessage.setReplyMarkup(markup);
+         sender.execute(editMessage);
+      } else {
+         SendMessage message = new SendMessage();
+         message.setChatId(chatId);
+         message.setText(text);
+         message.setReplyMarkup(markup);
+         sender.execute(message);
+      }
+   }
+
+   private InlineKeyboardMarkup buildCreateDurationKeyboard(int port) {
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -653,9 +721,8 @@ public class ResponseHandler {
       keyboard.add(row2);
       keyboard.add(row3);
       markup.setKeyboard(keyboard);
-      editMessage.setReplyMarkup(markup);
 
-      sender.execute(editMessage);
+      return markup;
    }
 
    private InlineKeyboardButton createDurationButton(String label, String callbackData) {
@@ -753,17 +820,30 @@ public class ResponseHandler {
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
       List<FrequentAppEntity> enabledApps = frequentAppService.getEnabledApps();
-      for (FrequentAppEntity app : enabledApps) {
-         InlineKeyboardButton appButton = new InlineKeyboardButton();
-         appButton.setText(app.getName());
-         appButton.setCallbackData("tunnel_frequent_app_" + app.getName());
-         keyboard.add(List.of(appButton));
-      }
+      List<InlineKeyboardButton> currentRow = new ArrayList<>();
 
       InlineKeyboardButton backButton = new InlineKeyboardButton();
       backButton.setText("🔙 Volver");
       backButton.setCallbackData("tunnel_menu");
-      keyboard.add(List.of(backButton));
+
+      for (FrequentAppEntity app : enabledApps) {
+         InlineKeyboardButton appButton = new InlineKeyboardButton();
+         appButton.setText(app.getName());
+         appButton.setCallbackData("tunnel_frequent_app_" + app.getName());
+         currentRow.add(appButton);
+
+         if (currentRow.size() == 2) {
+            keyboard.add(currentRow);
+            currentRow = new ArrayList<>();
+         }
+      }
+
+      if (currentRow.size() == 1) {
+         currentRow.add(backButton);
+         keyboard.add(currentRow);
+      } else {
+         keyboard.add(List.of(backButton));
+      }
 
       markup.setKeyboard(keyboard);
       editMessage.setReplyMarkup(markup);
