@@ -568,7 +568,7 @@ public class ResponseHandler {
    private void handleTunnelCancel(long chatId, String callbackData, String callbackQueryId) {
       String tunnelIdStr = callbackData.replace("tunnel_cancel_", "");
       try {
-         Long tunnelId = Long.parseLong(tunnelIdStr);
+         Integer tunnelId = Integer.parseInt(tunnelIdStr);
          tunnelService.cancelTunnel(tunnelId);
          SendMessage message = new SendMessage();
          message.setChatId(chatId);

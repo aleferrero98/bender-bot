@@ -10,7 +10,7 @@ import com.telegram.bender.model.ETunnelStatus;
 import com.telegram.bender.model.TunnelEntity;
 
 @Repository
-public interface TunnelRepository extends JpaRepository<TunnelEntity, Long> {
+public interface TunnelRepository extends JpaRepository<TunnelEntity, Integer> {
 
    List<TunnelEntity> findByStatus(ETunnelStatus status);
 

@@ -10,7 +10,7 @@ import com.telegram.bender.model.EFrequentAppStatus;
 import com.telegram.bender.model.FrequentAppEntity;
 
 @Repository
-public interface FrequentAppRepository extends JpaRepository<FrequentAppEntity, Long> {
+public interface FrequentAppRepository extends JpaRepository<FrequentAppEntity, Integer> {
 
    Optional<FrequentAppEntity> findByName(String name);
 

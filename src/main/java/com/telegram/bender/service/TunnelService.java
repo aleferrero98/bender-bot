@@ -89,7 +89,7 @@ public class TunnelService {
    }
 
    @Transactional
-   public void cancelTunnel(Long tunnelId) throws Exception {
+   public void cancelTunnel(Integer tunnelId) throws Exception {
       TunnelEntity tunnel = tunnelRepository.findById(tunnelId)
             .orElseThrow(() -> new Exception("Tunnel not found: " + tunnelId));
 
