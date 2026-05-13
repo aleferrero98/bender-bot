@@ -327,7 +327,7 @@ public class ResponseHandler {
          case "cooler_speed_100":
             handleCoolerSpeed(chatId, 100);
             break;
-         case "tunnel_menu":
+          case "tunnel_menu":
             replyToTunnelMenu(chatId);
             break;
          case "tunnel_list":
@@ -339,9 +339,14 @@ public class ResponseHandler {
          case "tunnel_frequent":
              replyToTunnelFrequentAppSelection(chatId, messageId);
             break;
+         case "tunnel_cancel":
+            replyToTunnelCancelSelection(chatId);
+            break;
           default:
-            if (callbackData.startsWith("tunnel_cancel_")) {
-               handleTunnelCancel(chatId, callbackData, callbackQueryId);
+            if (callbackData.startsWith("tunnel_cancel_select_")) {
+               replyToTunnelCancelConfirmation(chatId, callbackData);
+            } else if (callbackData.startsWith("tunnel_cancel_confirm_")) {
+               handleTunnelCancel(chatId, callbackData);
             } else if (callbackData.equals("tunnel_create_port_custom")) {
                replyToTunnelCreateCustomPort(chatId, messageId);
             } else if (callbackData.startsWith("tunnel_create_port_")) {
@@ -531,15 +536,13 @@ public class ResponseHandler {
       message.setText(text.toString());
       message.setParseMode(MARKDOWN);
 
-      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
-      for (TunnelEntity tunnel : activeTunnels) {
-         InlineKeyboardButton cancelButton = new InlineKeyboardButton();
-         cancelButton.setText("❌ Cancelar túnel " + tunnel.getId());
-         cancelButton.setCallbackData("tunnel_cancel_" + tunnel.getId());
-         keyboard.add(List.of(cancelButton));
-      }
+      InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+      cancelButton.setText("❌ Cancelar túnel");
+      cancelButton.setCallbackData("tunnel_cancel");
+      keyboard.add(List.of(cancelButton));
 
       InlineKeyboardButton backButton = new InlineKeyboardButton();
       backButton.setText("🔙 Volver al menú");
@@ -552,8 +555,8 @@ public class ResponseHandler {
       sender.execute(message);
    }
 
-   private void handleTunnelCancel(long chatId, String callbackData, String callbackQueryId) {
-      String tunnelIdStr = callbackData.replace("tunnel_cancel_", "");
+   private void handleTunnelCancel(long chatId, String callbackData) {
+      String tunnelIdStr = callbackData.replace("tunnel_cancel_confirm_", "");
       try {
          Integer tunnelId = Integer.parseInt(tunnelIdStr);
          tunnelService.cancelTunnel(tunnelId);
@@ -568,6 +571,68 @@ public class ResponseHandler {
          sender.execute(message);
       }
       replyToTunnelList(chatId);
+   }
+
+   private void replyToTunnelCancelSelection(long chatId) {
+      List<TunnelEntity> activeTunnels = tunnelService.getActiveTunnels();
+
+      if (activeTunnels.isEmpty()) {
+         SendMessage message = new SendMessage();
+         message.setChatId(chatId);
+         message.setText("📋 No hay túneles activos para cancelar.");
+         sender.execute(message);
+         return;
+      }
+
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("❌ Selecciona el túnel a cancelar:");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      for (TunnelEntity tunnel : activeTunnels) {
+         InlineKeyboardButton tunnelButton = new InlineKeyboardButton();
+         tunnelButton.setText("Túnel " + tunnel.getId() + " (🔌" + tunnel.getExposedPort() + ")");
+         tunnelButton.setCallbackData("tunnel_cancel_select_" + tunnel.getId());
+         keyboard.add(List.of(tunnelButton));
+      }
+
+      InlineKeyboardButton backButton = new InlineKeyboardButton();
+      backButton.setText("🔙 Volver");
+      backButton.setCallbackData("tunnel_list");
+      keyboard.add(List.of(backButton));
+
+      markup.setKeyboard(keyboard);
+      message.setReplyMarkup(markup);
+
+      sender.execute(message);
+   }
+
+   private void replyToTunnelCancelConfirmation(long chatId, String callbackData) {
+      String tunnelIdStr = callbackData.replace("tunnel_cancel_select_", "");
+      Integer tunnelId = Integer.parseInt(tunnelIdStr);
+
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("¿Estás seguro que querés cancelar el túnel " + tunnelId + "?");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton confirmButton = new InlineKeyboardButton();
+      confirmButton.setText("✅");
+      confirmButton.setCallbackData("tunnel_cancel_confirm_" + tunnelId);
+
+      InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+      cancelButton.setText("❌");
+      cancelButton.setCallbackData("tunnel_list");
+
+      keyboard.add(List.of(confirmButton, cancelButton));
+      markup.setKeyboard(keyboard);
+      message.setReplyMarkup(markup);
+
+      sender.execute(message);
    }
 
    private void replyToTunnelCreatePortSelection(long chatId, int messageId) {
