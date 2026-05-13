@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.sender.SilentSender;
@@ -21,7 +22,7 @@ import com.telegram.bender.model.TunnelEntity;
 public class ResponseHandler {
 
    private static final String MARKDOWN = "Markdown";
-   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
    private static final int MIN_PORT = 0;
    private static final int MAX_PORT = 65535;
 
@@ -517,12 +518,13 @@ public class ResponseHandler {
       }
 
       StringBuilder text = new StringBuilder("📋 *Túneles activos*\n\n");
-      for (TunnelEntity tunnel : activeTunnels) {
-         text.append(String.format("🔹 *ID:* %d\n", tunnel.getId()));
-         text.append(String.format("   🌐 *URL:* %s\n", tunnel.getUrl()));
-         text.append(String.format("   🔌 *Puerto:* %d\n", tunnel.getExposedPort()));
-         text.append(String.format("   ⏰ *Expira:* %s\n\n", tunnel.getExpiresAt().format(DATE_FORMATTER)));
-      }
+      String tunnelsText = activeTunnels.stream().map(
+         tunnel -> String.format(
+               "  🆔 *ID:* %d\n  🔗 *URL:* %s\n  🔌 *Puerto:* %d\n  ⏰ *Expira:* %s\n",
+               tunnel.getId(), tunnel.getUrl(), tunnel.getExposedPort(),
+               tunnel.getExpiresAt().format(DATE_FORMATTER))
+      ).collect(Collectors.joining("\n───────────────────\n\n"));
+      text.append(tunnelsText);
 
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
@@ -773,7 +775,7 @@ public class ResponseHandler {
          message.setText(String.format(
                "✅ *Túnel creado exitosamente*\n\n" +
                "🆔 *ID:* %d\n" +
-               "🌐 *URL:* %s\n" +
+               "🔗 *URL:* %s\n" +
                "🔌 *Puerto:* %d\n" +
                "⏰ *Expira:* %s\n" +
                "☁️ *Proveedor:* Cloudflare",
