@@ -343,7 +343,7 @@ public class ResponseHandler {
              replyToTunnelCancelSelection(chatId);
              break;
           case "backup_menu":
-             replyToBackupMenu(chatId);
+             replyToBackupMenu(chatId, messageId);
              break;
           case "backup_service":
              replyToServiceBackupSelection(chatId, messageId);
@@ -1062,7 +1062,24 @@ public class ResponseHandler {
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
       message.setText("💾 *Backup*\n\nSelecciona una opción:");
+      message.setReplyMarkup(buildBackupMenuMarkup());
+      message.setParseMode(MARKDOWN);
 
+      sender.execute(message);
+   }
+
+   private void replyToBackupMenu(long chatId, int messageId) {
+      EditMessageText editMessage = new EditMessageText();
+      editMessage.setChatId(chatId);
+      editMessage.setMessageId(messageId);
+      editMessage.setText("💾 *Backup*\n\nSelecciona una opción:");
+      editMessage.setReplyMarkup(buildBackupMenuMarkup());
+      editMessage.setParseMode(MARKDOWN);
+
+      sender.execute(editMessage);
+   }
+
+   private InlineKeyboardMarkup buildBackupMenuMarkup() {
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -1077,10 +1094,8 @@ public class ResponseHandler {
       keyboard.add(List.of(serviceButton));
       keyboard.add(List.of(coldButton));
       markup.setKeyboard(keyboard);
-      message.setReplyMarkup(markup);
-      message.setParseMode(MARKDOWN);
 
-      sender.execute(message);
+      return markup;
    }
 
    private void replyToServiceBackupSelection(long chatId, int messageId) {
