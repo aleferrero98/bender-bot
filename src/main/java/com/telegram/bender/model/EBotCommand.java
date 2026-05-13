@@ -14,6 +14,7 @@ public enum EBotCommand {
    COOLER("cooler", "Configurar la velocidad del cooler", "🎛️"),
    TUNNEL("tunnel", "Listar túneles SSH activos en el servidor", "🔗"),
    MANAGE("manage", "Administrar el servidor (reboot, shutdown, LEDs)", "⚙️"),
+   BACKUP("backup", "Generar backup del servidor", "💾"),
    HELP("help", "Mostrar lista de comandos disponibles", "❓");
 
    private final String name;

@@ -339,10 +339,31 @@ public class ResponseHandler {
          case "tunnel_frequent":
              replyToTunnelFrequentAppSelection(chatId, messageId);
             break;
-         case "tunnel_cancel":
-            replyToTunnelCancelSelection(chatId);
-            break;
-          default:
+          case "tunnel_cancel":
+             replyToTunnelCancelSelection(chatId);
+             break;
+          case "backup_menu":
+             replyToBackupMenu(chatId);
+             break;
+          case "backup_service":
+             replyToServiceBackupSelection(chatId, messageId);
+             break;
+          case "backup_cold":
+             replyToColdBackupConfirmation(chatId, messageId);
+             break;
+          case "backup_service_confirm_immich":
+             handleServiceBackup(chatId, "Immich", commandExecutorService.executeImmichBackup());
+             break;
+          case "backup_service_confirm_nextcloud":
+             handleServiceBackup(chatId, "Nextcloud", commandExecutorService.executeNextcloudBackup());
+             break;
+          case "backup_service_confirm_docker":
+             handleServiceBackup(chatId, "Docker", commandExecutorService.executeDockerBackup());
+             break;
+          case "backup_cold_confirm":
+             handleColdBackup(chatId);
+             break;
+           default:
             if (callbackData.startsWith("tunnel_cancel_select_")) {
                replyToTunnelCancelConfirmation(chatId, callbackData);
             } else if (callbackData.startsWith("tunnel_cancel_confirm_")) {
@@ -359,9 +380,15 @@ public class ResponseHandler {
                 handleTunnelFrequentAppSelection(chatId, messageId, callbackData);
             } else if (callbackData.startsWith("tunnel_frequent_duration_")) {
                handleTunnelFrequentDurationSelection(chatId, messageId, callbackData);
-            } else if (callbackData.startsWith("tunnel_frequent_confirm_")) {
+             } else if (callbackData.startsWith("tunnel_frequent_confirm_")) {
                handleTunnelFrequentConfirm(chatId, callbackData);
-            }
+             } else if (callbackData.equals("backup_service_immich")) {
+               replyToServiceBackupConfirmation(chatId, "Immich", "backup_service_confirm_immich");
+             } else if (callbackData.equals("backup_service_nextcloud")) {
+               replyToServiceBackupConfirmation(chatId, "Nextcloud", "backup_service_confirm_nextcloud");
+             } else if (callbackData.equals("backup_service_docker")) {
+               replyToServiceBackupConfirmation(chatId, "Docker", "backup_service_confirm_docker");
+             }
             break;
       }
    }
@@ -1029,5 +1056,149 @@ public class ResponseHandler {
          int days = minutes / 1440;
          return days + (days == 1 ? " día" : " días");
       }
+   }
+
+   public void replyToBackupMenu(long chatId) {
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("💾 *Backup*\n\nSelecciona una opción:");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton serviceButton = new InlineKeyboardButton();
+      serviceButton.setText("🔧 Service Backup");
+      serviceButton.setCallbackData("backup_service");
+
+      InlineKeyboardButton coldButton = new InlineKeyboardButton();
+      coldButton.setText("💿 Cold Backup");
+      coldButton.setCallbackData("backup_cold");
+
+      keyboard.add(List.of(serviceButton));
+      keyboard.add(List.of(coldButton));
+      markup.setKeyboard(keyboard);
+      message.setReplyMarkup(markup);
+      message.setParseMode(MARKDOWN);
+
+      sender.execute(message);
+   }
+
+   private void replyToServiceBackupSelection(long chatId, int messageId) {
+      EditMessageText editMessage = new EditMessageText();
+      editMessage.setChatId(chatId);
+      editMessage.setMessageId(messageId);
+      editMessage.setText("🔧 *Service Backup*\n\nSelecciona el servicio a respaldar:");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton immichButton = new InlineKeyboardButton();
+      immichButton.setText("📸 Immich");
+      immichButton.setCallbackData("backup_service_immich");
+
+      InlineKeyboardButton nextcloudButton = new InlineKeyboardButton();
+      nextcloudButton.setText("☁️ Nextcloud");
+      nextcloudButton.setCallbackData("backup_service_nextcloud");
+
+      InlineKeyboardButton dockerButton = new InlineKeyboardButton();
+      dockerButton.setText("🐳 Docker");
+      dockerButton.setCallbackData("backup_service_docker");
+
+      InlineKeyboardButton backButton = new InlineKeyboardButton();
+      backButton.setText("🔙 Volver");
+      backButton.setCallbackData("backup_menu");
+
+      keyboard.add(List.of(immichButton));
+      keyboard.add(List.of(nextcloudButton));
+      keyboard.add(List.of(dockerButton));
+      keyboard.add(List.of(backButton));
+      markup.setKeyboard(keyboard);
+      editMessage.setReplyMarkup(markup);
+      editMessage.setParseMode(MARKDOWN);
+
+      sender.execute(editMessage);
+   }
+
+   private void replyToServiceBackupConfirmation(long chatId, String serviceName, String callbackData) {
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("¿Estás seguro que querés ejecutar el backup de *" + serviceName + "*?");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton confirmButton = new InlineKeyboardButton();
+      confirmButton.setText("✅");
+      confirmButton.setCallbackData(callbackData);
+
+      InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+      cancelButton.setText("❌");
+      cancelButton.setCallbackData("backup_service");
+
+      keyboard.add(List.of(confirmButton, cancelButton));
+      markup.setKeyboard(keyboard);
+      message.setReplyMarkup(markup);
+      message.setParseMode(MARKDOWN);
+
+      sender.execute(message);
+   }
+
+   private void handleServiceBackup(long chatId, String serviceName, boolean success) {
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+
+      if (success) {
+         message.setText("✅ Backup de *" + serviceName + "* completado exitosamente");
+         message.setParseMode(MARKDOWN);
+      } else {
+         message.setText("❌ Error al ejecutar el backup de " + serviceName);
+      }
+
+      sender.execute(message);
+   }
+
+   private void replyToColdBackupConfirmation(long chatId, int messageId) {
+      EditMessageText editMessage = new EditMessageText();
+      editMessage.setChatId(chatId);
+      editMessage.setMessageId(messageId);
+      editMessage.setText("💿 *Cold Backup*\n\n¿Desea comenzar la ejecución del backup externo?\n\n⚠️ _Asegúrese de que el disco esté conectado y montado antes de continuar_");
+
+      InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+      List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+      InlineKeyboardButton confirmButton = new InlineKeyboardButton();
+      confirmButton.setText("✅");
+      confirmButton.setCallbackData("backup_cold_confirm");
+
+      InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+      cancelButton.setText("❌");
+      cancelButton.setCallbackData("backup_menu");
+
+      keyboard.add(List.of(confirmButton, cancelButton));
+      markup.setKeyboard(keyboard);
+      editMessage.setReplyMarkup(markup);
+      editMessage.setParseMode(MARKDOWN);
+
+      sender.execute(editMessage);
+   }
+
+   private void handleColdBackup(long chatId) {
+      SendMessage waitMessage = new SendMessage();
+      waitMessage.setChatId(chatId);
+      waitMessage.setText("⏳ Ejecutando cold backup...");
+      sender.execute(waitMessage);
+
+      boolean success = commandExecutorService.executeColdBackup();
+
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+
+      if (success) {
+         message.setText("✅ Cold backup completado exitosamente");
+      } else {
+         message.setText("❌ Error al ejecutar el cold backup");
+      }
+
+      sender.execute(message);
    }
 }

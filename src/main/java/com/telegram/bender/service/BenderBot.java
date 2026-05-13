@@ -138,6 +138,19 @@ public class BenderBot extends AbilityBot {
                     .build();
    }
 
+   // Command /backup
+   public Ability backup() {
+      return Ability.builder()
+                    .name(EBotCommand.BACKUP.getName())
+                    .info(EBotCommand.BACKUP.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToBackupMenu(ctx.chatId());
+                    })
+                    .build();
+   }
+
    // This method allows filtering by buttons (not commands or text)
    private Predicate<Update> isCallbackQuery() {
       return upd -> upd.hasCallbackQuery();
