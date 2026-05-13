@@ -11,6 +11,7 @@ import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -185,10 +186,14 @@ public class ResponseHandler {
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
       InlineKeyboardButton confirmButton = new InlineKeyboardButton();
-      confirmButton.setText("✅ Confirmar Reboot");
+      confirmButton.setText("✅");
       confirmButton.setCallbackData("confirm_reboot");
 
-      keyboard.add(List.of(confirmButton));
+      InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+      cancelButton.setText("❌");
+      cancelButton.setCallbackData("reboot_cancel");
+
+      keyboard.add(List.of(confirmButton, cancelButton));
       markup.setKeyboard(keyboard);
       message.setReplyMarkup(markup);
 
@@ -204,10 +209,14 @@ public class ResponseHandler {
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
       InlineKeyboardButton confirmButton = new InlineKeyboardButton();
-      confirmButton.setText("✅ Confirmar Shutdown");
+      confirmButton.setText("✅");
       confirmButton.setCallbackData("confirm_shutdown");
 
-      keyboard.add(List.of(confirmButton));
+      InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+      cancelButton.setText("❌");
+      cancelButton.setCallbackData("shutdown_cancel");
+
+      keyboard.add(List.of(confirmButton, cancelButton));
       markup.setKeyboard(keyboard);
       message.setReplyMarkup(markup);
 
@@ -275,7 +284,7 @@ public class ResponseHandler {
    public void handleCallbackQuery(long chatId, int messageId, String callbackData, String callbackQueryId) {
       answerCallbackQuery(callbackQueryId);
 
-      switch (callbackData) {
+       switch (callbackData) {
          case "confirm_reboot":
             sendRebootRequestMessage(chatId);
             break;
@@ -287,6 +296,10 @@ public class ResponseHandler {
             break;
          case "shutdown":
             replyToShutdownConfirmation(chatId);
+            break;
+         case "reboot_cancel":
+         case "shutdown_cancel":
+            handleCancelConfirmation(chatId, messageId);
             break;
          case "turn_off_leds":
             replyToTurnOffLeds(chatId);
@@ -342,6 +355,12 @@ public class ResponseHandler {
          case "tunnel_cancel":
             replyToTunnelCancelSelection(chatId);
             break;
+         case "tunnel_list_dismiss":
+         case "tunnel_cancel_dismiss":
+         case "tunnel_cancel_discard":
+         case "tunnel_create_dismiss":
+            handleCancelConfirmation(chatId, messageId);
+            break;
           default:
             if (callbackData.startsWith("tunnel_cancel_select_")) {
                replyToTunnelCancelConfirmation(chatId, callbackData);
@@ -370,6 +389,13 @@ public class ResponseHandler {
       AnswerCallbackQuery answer = new AnswerCallbackQuery();
       answer.setCallbackQueryId(callbackQueryId);
       sender.execute(answer);
+   }
+
+   private void handleCancelConfirmation(long chatId, int messageId) {
+      DeleteMessage deleteMessage = new DeleteMessage();
+      deleteMessage.setChatId(chatId);
+      deleteMessage.setMessageId(messageId);
+      sender.execute(deleteMessage);
    }
 
    private void sendRebootRequestMessage(long chatId) {
@@ -546,7 +572,7 @@ public class ResponseHandler {
 
       InlineKeyboardButton backButton = new InlineKeyboardButton();
       backButton.setText("🔙 Volver al menú");
-      backButton.setCallbackData("tunnel_menu");
+      backButton.setCallbackData("tunnel_list_dismiss");
       keyboard.add(List.of(backButton));
 
       markup.setKeyboard(keyboard);
@@ -600,7 +626,7 @@ public class ResponseHandler {
 
       InlineKeyboardButton backButton = new InlineKeyboardButton();
       backButton.setText("🔙 Volver");
-      backButton.setCallbackData("tunnel_list");
+      backButton.setCallbackData("tunnel_cancel_dismiss");
       keyboard.add(List.of(backButton));
 
       markup.setKeyboard(keyboard);
@@ -626,7 +652,7 @@ public class ResponseHandler {
 
       InlineKeyboardButton cancelButton = new InlineKeyboardButton();
       cancelButton.setText("❌");
-      cancelButton.setCallbackData("tunnel_list");
+      cancelButton.setCallbackData("tunnel_cancel_discard");
 
       keyboard.add(List.of(confirmButton, cancelButton));
       markup.setKeyboard(keyboard);
@@ -636,10 +662,9 @@ public class ResponseHandler {
    }
 
    private void replyToTunnelCreatePortSelection(long chatId, int messageId) {
-      EditMessageText editMessage = new EditMessageText();
-      editMessage.setChatId(chatId);
-      editMessage.setMessageId(messageId);
-      editMessage.setText("🔌 Selecciona el puerto a exponer:");
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("🔌 Selecciona el puerto a exponer:");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -653,15 +678,15 @@ public class ResponseHandler {
       row2.add(createPortButton("✏️ Otro", "tunnel_create_port_custom"));
 
       List<InlineKeyboardButton> row3 = new ArrayList<>();
-      row3.add(createPortButton("🔙 Volver", "tunnel_menu"));
+      row3.add(createPortButton("🔙 Volver", "tunnel_create_dismiss"));
 
       keyboard.add(row1);
       keyboard.add(row2);
       keyboard.add(row3);
       markup.setKeyboard(keyboard);
-      editMessage.setReplyMarkup(markup);
+      message.setReplyMarkup(markup);
 
-      sender.execute(editMessage);
+      sender.execute(message);
    }
 
    private InlineKeyboardButton createPortButton(String label, String callbackData) {
@@ -680,23 +705,22 @@ public class ResponseHandler {
    private void replyToTunnelCreateCustomPort(long chatId, int messageId) {
       awaitingCustomPort.put(chatId, "tunnel_create");
 
-      EditMessageText editMessage = new EditMessageText();
-      editMessage.setChatId(chatId);
-      editMessage.setMessageId(messageId);
-      editMessage.setText("✏️ Ingresa el número de puerto (0-65535):");
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("✏️ Ingresa el número de puerto (0-65535):");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
       InlineKeyboardButton cancelButton = new InlineKeyboardButton();
       cancelButton.setText("🔙 Cancelar");
-      cancelButton.setCallbackData("tunnel_menu");
+      cancelButton.setCallbackData("tunnel_create_dismiss");
       keyboard.add(List.of(cancelButton));
 
       markup.setKeyboard(keyboard);
-      editMessage.setReplyMarkup(markup);
+      message.setReplyMarkup(markup);
 
-      sender.execute(editMessage);
+      sender.execute(message);
    }
 
    public boolean isAwaitingCustomPort(long chatId) {
@@ -731,20 +755,11 @@ public class ResponseHandler {
       String text = "⏰ Selecciona el período disponible para el puerto " + port + ":";
       InlineKeyboardMarkup markup = buildCreateDurationKeyboard(port);
 
-      if (messageId > 0) {
-         EditMessageText editMessage = new EditMessageText();
-         editMessage.setChatId(chatId);
-         editMessage.setMessageId(messageId);
-         editMessage.setText(text);
-         editMessage.setReplyMarkup(markup);
-         sender.execute(editMessage);
-      } else {
-         SendMessage message = new SendMessage();
-         message.setChatId(chatId);
-         message.setText(text);
-         message.setReplyMarkup(markup);
-         sender.execute(message);
-      }
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText(text);
+      message.setReplyMarkup(markup);
+      sender.execute(message);
    }
 
    private InlineKeyboardMarkup buildCreateDurationKeyboard(int port) {
@@ -762,7 +777,7 @@ public class ResponseHandler {
       row2.add(createDurationButton("7 días", "tunnel_create_duration_" + port + "_10080"));
 
       List<InlineKeyboardButton> row3 = new ArrayList<>();
-      row3.add(createDurationButton("🔙 Volver", "tunnel_create"));
+      row3.add(createDurationButton("🔙 Volver", "tunnel_create_dismiss"));
 
       keyboard.add(row1);
       keyboard.add(row2);
@@ -789,10 +804,9 @@ public class ResponseHandler {
    private void replyToTunnelCreateConfirmation(long chatId, int messageId, int port, int durationMinutes) {
       String durationText = formatDuration(durationMinutes);
 
-      EditMessageText editMessage = new EditMessageText();
-      editMessage.setChatId(chatId);
-      editMessage.setMessageId(messageId);
-      editMessage.setText(String.format(
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText(String.format(
             "📋 *Resumen del túnel*\n\n" +
             "🔌 *Puerto:* %d\n" +
             "⏰ *Duración:* %s\n" +
@@ -800,25 +814,24 @@ public class ResponseHandler {
             "¿Confirmás la creación del túnel?",
             port, durationText
       ));
-      editMessage.setParseMode(MARKDOWN);
+      message.setParseMode(MARKDOWN);
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
       InlineKeyboardButton confirmButton = new InlineKeyboardButton();
-      confirmButton.setText("✅ Confirmar");
+      confirmButton.setText("✅");
       confirmButton.setCallbackData("tunnel_create_confirm_" + port + "_" + durationMinutes);
 
       InlineKeyboardButton cancelButton = new InlineKeyboardButton();
-      cancelButton.setText("❌ Cancelar");
-      cancelButton.setCallbackData("tunnel_menu");
+      cancelButton.setText("❌");
+      cancelButton.setCallbackData("tunnel_create_dismiss");
 
-      keyboard.add(List.of(confirmButton));
-      keyboard.add(List.of(cancelButton));
+      keyboard.add(List.of(confirmButton, cancelButton));
       markup.setKeyboard(keyboard);
-      editMessage.setReplyMarkup(markup);
+      message.setReplyMarkup(markup);
 
-      sender.execute(editMessage);
+      sender.execute(message);
    }
 
    private void handleTunnelCreateConfirm(long chatId, String callbackData) {
@@ -833,7 +846,6 @@ public class ResponseHandler {
 
       try {
          TunnelEntity tunnel = tunnelService.createTunnel(port, durationMinutes);
-         String durationText = formatDuration(durationMinutes);
 
          SendMessage message = new SendMessage();
          message.setChatId(chatId);
@@ -852,7 +864,7 @@ public class ResponseHandler {
       } catch (Exception e) {
          SendMessage message = new SendMessage();
          message.setChatId(chatId);
-         message.setText("❌ Error al crear el túnel: " + e.getMessage());
+         message.setText("❌ Error al crear el túnel");
          sender.execute(message);
       }
    }
@@ -965,15 +977,14 @@ public class ResponseHandler {
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
       InlineKeyboardButton confirmButton = new InlineKeyboardButton();
-      confirmButton.setText("✅ Confirmar");
+      confirmButton.setText("✅");
       confirmButton.setCallbackData("tunnel_frequent_confirm_" + serviceName + "_" + durationMinutes);
 
       InlineKeyboardButton cancelButton = new InlineKeyboardButton();
-      cancelButton.setText("❌ Cancelar");
+      cancelButton.setText("❌");
       cancelButton.setCallbackData("tunnel_menu");
 
-      keyboard.add(List.of(confirmButton));
-      keyboard.add(List.of(cancelButton));
+      keyboard.add(List.of(confirmButton, cancelButton));
       markup.setKeyboard(keyboard);
       editMessage.setReplyMarkup(markup);
 
@@ -994,7 +1005,6 @@ public class ResponseHandler {
 
       try {
          TunnelEntity tunnel = tunnelService.createFrequentAppTunnel(serviceName, durationMinutes);
-         String durationText = formatDuration(durationMinutes);
 
          SendMessage message = new SendMessage();
          message.setChatId(chatId);
@@ -1014,7 +1024,7 @@ public class ResponseHandler {
       } catch (Exception e) {
          SendMessage message = new SendMessage();
          message.setChatId(chatId);
-         message.setText("❌ Error al crear el túnel: " + e.getMessage());
+         message.setText("❌ Error al crear el túnel");
          sender.execute(message);
       }
    }
