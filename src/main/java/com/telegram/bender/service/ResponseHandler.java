@@ -272,93 +272,73 @@ public class ResponseHandler {
    }
 
    public void handleCallbackQuery(long chatId, int messageId, String callbackData, String callbackQueryId) {
+      answerCallbackQuery(callbackQueryId);
+
       switch (callbackData) {
          case "confirm_reboot":
-            answerCallbackQuery(callbackQueryId);
             sendRebootRequestMessage(chatId);
             break;
          case "confirm_shutdown":
-            answerCallbackQuery(callbackQueryId);
             sendShutdownRequestMessage(chatId);
             break;
          case "reboot":
-            answerCallbackQuery(callbackQueryId);
             replyToRebootConfirmation(chatId);
             break;
          case "shutdown":
-            answerCallbackQuery(callbackQueryId);
             replyToShutdownConfirmation(chatId);
             break;
          case "turn_off_leds":
-            answerCallbackQuery(callbackQueryId);
             replyToTurnOffLeds(chatId);
             break;
          case "info_system":
-            answerCallbackQuery(callbackQueryId);
             replyToInfo(chatId);
             break;
          case "info_temperature":
-            answerCallbackQuery(callbackQueryId);
             replyToTemperature(chatId);
             break;
          case "cooler_set_speed":
-            answerCallbackQuery(callbackQueryId);
             replyToCoolerSpeedSelection(chatId, messageId);
             break;
          case "cooler_temp_controller":
-            answerCallbackQuery(callbackQueryId);
             replyToTempControllerStatus(chatId);
             break;
          case "cooler_temp_controller_start":
-            answerCallbackQuery(callbackQueryId);
             handleTempControllerStart(chatId);
             break;
          case "cooler_temp_controller_stop":
-            answerCallbackQuery(callbackQueryId);
             handleTempControllerStop(chatId);
             break;
          case "cooler_speed_0":
-            answerCallbackQuery(callbackQueryId);
             handleCoolerSpeed(chatId, 0);
             break;
          case "cooler_speed_25":
-            answerCallbackQuery(callbackQueryId);
             handleCoolerSpeed(chatId, 25);
             break;
          case "cooler_speed_50":
-            answerCallbackQuery(callbackQueryId);
             handleCoolerSpeed(chatId, 50);
             break;
          case "coiler_speed_70":
-            answerCallbackQuery(callbackQueryId);
             handleCoolerSpeed(chatId, 70);
             break;
          case "cooler_speed_85":
-            answerCallbackQuery(callbackQueryId);
             handleCoolerSpeed(chatId, 85);
             break;
          case "cooler_speed_100":
-            answerCallbackQuery(callbackQueryId);
             handleCoolerSpeed(chatId, 100);
             break;
          case "tunnel_menu":
-            answerCallbackQuery(callbackQueryId);
             replyToTunnelMenu(chatId);
             break;
          case "tunnel_list":
-            answerCallbackQuery(callbackQueryId);
             replyToTunnelList(chatId);
             break;
          case "tunnel_create":
-            answerCallbackQuery(callbackQueryId);
             replyToTunnelCreatePortSelection(chatId, messageId);
             break;
          case "tunnel_frequent":
-            answerCallbackQuery(callbackQueryId);
              replyToTunnelFrequentAppSelection(chatId, messageId);
             break;
           default:
-            answerCallbackQuery(callbackQueryId);
             if (callbackData.startsWith("tunnel_cancel_")) {
                handleTunnelCancel(chatId, callbackData, callbackQueryId);
             } else if (callbackData.equals("tunnel_create_port_custom")) {
