@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.telegram</groupId>
 	<artifactId>bender-bot</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<name>Bender Bot</name>
 	<description>A Java-powered Telegram bot to manage my Bender server</description>
 	<url/>
