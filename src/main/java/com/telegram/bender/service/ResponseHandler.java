@@ -284,7 +284,7 @@ public class ResponseHandler {
    public void handleCallbackQuery(long chatId, int messageId, String callbackData, String callbackQueryId) {
       answerCallbackQuery(callbackQueryId);
 
-       switch (callbackData) {
+      switch (callbackData) {
          case "confirm_reboot":
             sendRebootRequestMessage(chatId);
             break;
@@ -336,7 +336,7 @@ public class ResponseHandler {
          case "cooler_speed_100":
             handleCoolerSpeed(chatId, 100);
             break;
-          case "tunnel_menu":
+         case "tunnel_menu":
             replyToTunnelMenu(chatId);
             break;
          case "tunnel_list":
@@ -346,7 +346,7 @@ public class ResponseHandler {
             replyToTunnelCreatePortSelection(chatId, messageId);
             break;
          case "tunnel_frequent":
-             replyToTunnelFrequentAppSelection(chatId, messageId);
+            replyToTunnelFrequentAppSelection(chatId, messageId);
             break;
          case "tunnel_cancel":
             replyToTunnelCancelSelection(chatId);
@@ -360,28 +360,28 @@ public class ResponseHandler {
          case "tunnel_frequent_dismiss":
             handleCancelConfirmation(chatId, messageId);
             break;
-          case "backup_menu":
-             replyToBackupMenu(chatId, messageId);
-             break;
-          case "backup_service":
-             replyToServiceBackupSelection(chatId, messageId);
-             break;
-          case "backup_cold":
-             replyToColdBackupConfirmation(chatId, messageId);
-             break;
-          case "backup_service_confirm_immich":
-             handleServiceBackup(chatId, "Immich", commandExecutorService.executeImmichBackup());
-             break;
-          case "backup_service_confirm_nextcloud":
-             handleServiceBackup(chatId, "Nextcloud", commandExecutorService.executeNextcloudBackup());
-             break;
-          case "backup_service_confirm_docker":
-             handleServiceBackup(chatId, "Docker", commandExecutorService.executeDockerBackup());
-             break;
-          case "backup_cold_confirm":
-             handleColdBackup(chatId);
-             break;
-           default:
+         case "backup_menu":
+            replyToBackupMenu(chatId, messageId);
+            break;
+         case "backup_service":
+            replyToServiceBackupSelection(chatId, messageId);
+            break;
+         case "backup_cold":
+            replyToColdBackupConfirmation(chatId, messageId);
+            break;
+         case "backup_service_confirm_immich":
+            handleServiceBackup(chatId, "Immich", commandExecutorService.executeImmichBackup());
+            break;
+         case "backup_service_confirm_nextcloud":
+            handleServiceBackup(chatId, "Nextcloud", commandExecutorService.executeNextcloudBackup());
+            break;
+         case "backup_service_confirm_docker":
+            handleServiceBackup(chatId, "Docker", commandExecutorService.executeDockerBackup());
+            break;
+         case "backup_cold_confirm":
+            handleColdBackup(chatId);
+            break;
+         default:
             if (callbackData.startsWith("tunnel_cancel_select_")) {
                replyToTunnelCancelConfirmation(chatId, callbackData);
             } else if (callbackData.startsWith("tunnel_cancel_confirm_")) {
@@ -394,19 +394,19 @@ public class ResponseHandler {
                handleTunnelCreateDurationSelection(chatId, callbackData);
             } else if (callbackData.startsWith("tunnel_create_confirm_")) {
                handleTunnelCreateConfirm(chatId, callbackData);
-             } else if (callbackData.startsWith("tunnel_frequent_app_")) {
-                handleTunnelFrequentAppSelection(chatId, messageId, callbackData);
+            } else if (callbackData.startsWith("tunnel_frequent_app_")) {
+               handleTunnelFrequentAppSelection(chatId, messageId, callbackData);
             } else if (callbackData.startsWith("tunnel_frequent_duration_")) {
                handleTunnelFrequentDurationSelection(chatId, messageId, callbackData);
-             } else if (callbackData.startsWith("tunnel_frequent_confirm_")) {
+            } else if (callbackData.startsWith("tunnel_frequent_confirm_")) {
                handleTunnelFrequentConfirm(chatId, callbackData);
-             } else if (callbackData.equals("backup_service_immich")) {
+            } else if (callbackData.equals("backup_service_immich")) {
                replyToServiceBackupConfirmation(chatId, "Immich", "backup_service_confirm_immich");
-             } else if (callbackData.equals("backup_service_nextcloud")) {
+            } else if (callbackData.equals("backup_service_nextcloud")) {
                replyToServiceBackupConfirmation(chatId, "Nextcloud", "backup_service_confirm_nextcloud");
-             } else if (callbackData.equals("backup_service_docker")) {
+            } else if (callbackData.equals("backup_service_docker")) {
                replyToServiceBackupConfirmation(chatId, "Docker", "backup_service_confirm_docker");
-             }
+            }
             break;
       }
    }
