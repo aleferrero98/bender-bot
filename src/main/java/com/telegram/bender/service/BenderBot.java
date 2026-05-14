@@ -141,8 +141,8 @@ public class BenderBot extends AbilityBot {
    // Command /backup
    public Ability backup() {
       return Ability.builder()
-                    .name(EBotCommand.BACKUP.getName())
-                    .info(EBotCommand.BACKUP.getDescription())
+                    .name(EBotCommand.BACKUPS.getName())
+                    .info(EBotCommand.BACKUPS.getDescription())
                     .locality(Locality.USER)
                     .privacy(Privacy.CREATOR)
                     .action(ctx -> {

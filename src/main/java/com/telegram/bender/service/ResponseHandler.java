@@ -42,13 +42,23 @@ public class ResponseHandler {
       this.awaitingCustomPort = new ConcurrentHashMap<>();
    }
 
-   public void replyToStart(long chatId) { // TODO add welcome message with available commands and features
+   public void replyToStart(long chatId) {
+      StringBuilder text = new StringBuilder();
+      text.append("🤖 *¿Qué hacemos, jefe?*\n\n");
+      text.append("⚡ /info - Ver estado del sistema\n");
+      text.append("🎛️ /cooler - Controlar ventilación\n");
+      text.append("🔗 /tunnel - Gestionar túneles\n");
+      text.append("⚙️ /manage - Reiniciar, apagar, LEDs\n");
+      text.append("💾 /backup - Respaldar datos\n");
+      text.append("❓ /help - Lista completa de comandos\n\n");
+      text.append("_¿Querés que haga algo o solo mirás?_");
+
       SendMessage message = new SendMessage();
       message.setChatId(chatId);
-      message.setText("Hola soy Bender! 🤖");
+      message.setText(text.toString());
+      message.setParseMode(MARKDOWN);
 
       sender.execute(message);
-      // chatStatus.put(chatId, AWAITING_NAME);
    }
 
    public void replyToInfo(long chatId) {
