@@ -297,10 +297,6 @@ public class ResponseHandler {
          case "shutdown":
             replyToShutdownConfirmation(chatId);
             break;
-         case "reboot_cancel":
-         case "shutdown_cancel":
-            handleCancelConfirmation(chatId, messageId);
-            break;
          case "turn_off_leds":
             replyToTurnOffLeds(chatId);
             break;
@@ -355,6 +351,8 @@ public class ResponseHandler {
          case "tunnel_cancel":
             replyToTunnelCancelSelection(chatId);
             break;
+         case "reboot_cancel":
+         case "shutdown_cancel":
          case "tunnel_list_dismiss":
          case "tunnel_cancel_dismiss":
          case "tunnel_cancel_discard":
@@ -370,7 +368,7 @@ public class ResponseHandler {
             } else if (callbackData.equals("tunnel_create_port_custom")) {
                replyToTunnelCreateCustomPort(chatId, messageId);
             } else if (callbackData.startsWith("tunnel_create_port_")) {
-               handleTunnelCreatePortSelection(chatId, messageId, callbackData);
+               handleTunnelCreatePortSelection(chatId, callbackData);
             } else if (callbackData.startsWith("tunnel_create_duration_")) {
                handleTunnelCreateDurationSelection(chatId, callbackData);
             } else if (callbackData.startsWith("tunnel_create_confirm_")) {
@@ -697,10 +695,10 @@ public class ResponseHandler {
       return button;
    }
 
-   private void handleTunnelCreatePortSelection(long chatId, int messageId, String callbackData) {
+   private void handleTunnelCreatePortSelection(long chatId, String callbackData) {
       String portStr = callbackData.replace("tunnel_create_port_", "");
       int port = Integer.parseInt(portStr);
-      replyToTunnelCreateDurationSelection(chatId, messageId, port);
+      replyToTunnelCreateDurationSelection(chatId, port);
    }
 
    private void replyToTunnelCreateCustomPort(long chatId, int messageId) {
@@ -743,7 +741,7 @@ public class ResponseHandler {
             sender.execute(message);
             return;
          }
-         replyToTunnelCreateDurationSelection(chatId, 0, port);
+         replyToTunnelCreateDurationSelection(chatId, port);
       } catch (NumberFormatException e) {
          SendMessage message = new SendMessage();
          message.setChatId(chatId);
@@ -752,7 +750,7 @@ public class ResponseHandler {
       }
    }
 
-   private void replyToTunnelCreateDurationSelection(long chatId, int messageId, int port) {
+   private void replyToTunnelCreateDurationSelection(long chatId, int port) {
       String text = "⏰ Selecciona el período disponible para el puerto " + port + ":";
       InlineKeyboardMarkup markup = buildCreateDurationKeyboard(port);
 
