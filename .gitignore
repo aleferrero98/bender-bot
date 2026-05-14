@@ -9,6 +9,8 @@ TODO
 mysql/data/
 DolarometroBot
 deploy.sh
+ArbolitoBotonBot
+ArbolitoBotonBot.*
 
 ### STS ###
 .apt_generated

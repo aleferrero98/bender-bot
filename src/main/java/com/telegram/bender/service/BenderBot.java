@@ -32,10 +32,11 @@ public class BenderBot extends AbilityBot {
    private final ResponseHandler responseHandler;
 
    public BenderBot(@Value("${telegram.bot.token}") String botToken,
-         @Value("${telegram.bot.username}") String botUsername, @Value("${telegram.bot.creator}") Long creatorId) {
+         @Value("${telegram.bot.username}") String botUsername, @Value("${telegram.bot.creator}") Long creatorId,
+         TunnelService tunnelService, FrequentAppService frequentAppService) {
       super(botToken, botUsername);
       this.creatorId = creatorId;
-      this.responseHandler = new ResponseHandler(silent, db);
+      this.responseHandler = new ResponseHandler(silent, db, tunnelService, frequentAppService);
       this.registerBotCommands();
    }
 
@@ -124,6 +125,32 @@ public class BenderBot extends AbilityBot {
                     .build();
    }
 
+   // Command /tunnel
+   public Ability tunnel() {
+      return Ability.builder()
+                    .name(EBotCommand.TUNNEL.getName())
+                    .info(EBotCommand.TUNNEL.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToTunnelMenu(ctx.chatId());
+                    })
+                    .build();
+   }
+
+   // Command /backup
+   public Ability backup() {
+      return Ability.builder()
+                    .name(EBotCommand.BACKUPS.getName())
+                    .info(EBotCommand.BACKUPS.getDescription())
+                    .locality(Locality.USER)
+                    .privacy(Privacy.CREATOR)
+                    .action(ctx -> {
+                       responseHandler.replyToBackupMenu(ctx.chatId());
+                    })
+                    .build();
+   }
+
    // This method allows filtering by buttons (not commands or text)
    private Predicate<Update> isCallbackQuery() {
       return upd -> upd.hasCallbackQuery();
@@ -144,7 +171,11 @@ public class BenderBot extends AbilityBot {
    public Reply handleUnknownMessage() {
       return Reply.of((bot, upd) -> {
          long chatId = upd.getMessage().getChatId();
-         responseHandler.handleUnknownMessage(chatId);
+         if (responseHandler.isAwaitingCustomPort(chatId)) {
+            responseHandler.handleCustomPortInput(chatId, upd.getMessage().getText());
+         } else {
+            responseHandler.handleUnknownMessage(chatId);
+         }
       }, Flag.TEXT, isNotCommand());
    }
 
