@@ -3,10 +3,8 @@ package com.telegram.bender.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TunnelService {
 
    private static final Pattern URL_PATTERN = Pattern.compile("https://[a-zA-Z0-9-]+\\.trycloudflare\\.com");
-   private static final int URL_EXTRACTION_TIMEOUT_SECONDS = 30;
+   private static final int URL_EXTRACTION_TIMEOUT_SECONDS = 10;
 
    private final CommandExecutorService commandExecutorService;
    private final ShortIoClient shortIoClient;
@@ -133,15 +131,18 @@ public class TunnelService {
 
    private String extractUrlFromProcess(Process process) throws Exception {
       CompletableFuture<String> urlFuture = new CompletableFuture<>();
+      StringBuilder stderrOutput = new StringBuilder();
 
       Thread readerThread = new Thread(() -> {
-         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+         try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String line;
             while ((line = reader.readLine()) != null) {
+               stderrOutput.append(line).append("\n");
                Matcher matcher = URL_PATTERN.matcher(line);
                if (matcher.find()) {
                   urlFuture.complete(matcher.group());
-                  return;
+                  break;
                }
             }
          } catch (Exception ex) {
@@ -152,11 +153,21 @@ public class TunnelService {
       readerThread.setDaemon(true);
       readerThread.start();
 
-      try {
-         return urlFuture.get(URL_EXTRACTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-      } catch (java.util.concurrent.TimeoutException ex) {
-         process.destroyForcibly();
-         throw new Exception("Timeout waiting for tunnel URL");
+      long deadline = System.currentTimeMillis() + (URL_EXTRACTION_TIMEOUT_SECONDS * 1000L);
+      while (System.currentTimeMillis() < deadline) {
+         if (urlFuture.isDone()) {
+            return urlFuture.get();
+         }
+         if (!process.isAlive()) {
+            int exitCode = process.exitValue();
+            log.error("Cloudflared exited prematurely with code {}. Stderr:\n{}", exitCode, stderrOutput);
+            throw new Exception("Cloudflared exited with code " + exitCode + ": " + stderrOutput.toString().trim());
+         }
+         Thread.sleep(200);
       }
+
+      process.destroyForcibly();
+      log.error("Timeout waiting for tunnel URL. Stderr:\n{}", stderrOutput);
+      throw new Exception("Timeout waiting for tunnel URL. Cloudflared output:\n" + stderrOutput.toString().trim());
    }
 }

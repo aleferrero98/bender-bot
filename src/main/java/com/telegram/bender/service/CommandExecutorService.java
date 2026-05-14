@@ -201,9 +201,11 @@ public class CommandExecutorService {
 
    public Process executeCloudflaredTunnel(int port) throws Exception {
       try {
-         Process process = new ProcessBuilder(
+         ProcessBuilder pb = new ProcessBuilder(
                "cloudflared", "tunnel", "--url", "http://localhost:" + port
-         ).start();
+         );
+         pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+         Process process = pb.start();
          log.info("Cloudflared tunnel started on port {} with PID {}", port, process.pid());
          return process;
       } catch (Exception ex) {
