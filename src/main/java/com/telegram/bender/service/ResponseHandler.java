@@ -359,6 +359,7 @@ public class ResponseHandler {
          case "tunnel_cancel_dismiss":
          case "tunnel_cancel_discard":
          case "tunnel_create_dismiss":
+         case "tunnel_frequent_dismiss":
             handleCancelConfirmation(chatId, messageId);
             break;
           default:
@@ -371,7 +372,7 @@ public class ResponseHandler {
             } else if (callbackData.startsWith("tunnel_create_port_")) {
                handleTunnelCreatePortSelection(chatId, messageId, callbackData);
             } else if (callbackData.startsWith("tunnel_create_duration_")) {
-               handleTunnelCreateDurationSelection(chatId, messageId, callbackData);
+               handleTunnelCreateDurationSelection(chatId, callbackData);
             } else if (callbackData.startsWith("tunnel_create_confirm_")) {
                handleTunnelCreateConfirm(chatId, callbackData);
              } else if (callbackData.startsWith("tunnel_frequent_app_")) {
@@ -794,14 +795,14 @@ public class ResponseHandler {
       return button;
    }
 
-   private void handleTunnelCreateDurationSelection(long chatId, int messageId, String callbackData) {
+   private void handleTunnelCreateDurationSelection(long chatId, String callbackData) {
       String[] parts = callbackData.replace("tunnel_create_duration_", "").split("_");
       int port = Integer.parseInt(parts[0]);
       int duration = Integer.parseInt(parts[1]);
-      replyToTunnelCreateConfirmation(chatId, messageId, port, duration);
+      replyToTunnelCreateConfirmation(chatId, port, duration);
    }
 
-   private void replyToTunnelCreateConfirmation(long chatId, int messageId, int port, int durationMinutes) {
+   private void replyToTunnelCreateConfirmation(long chatId, int port, int durationMinutes) {
       String durationText = formatDuration(durationMinutes);
 
       SendMessage message = new SendMessage();
@@ -870,10 +871,9 @@ public class ResponseHandler {
    }
 
    private void replyToTunnelFrequentAppSelection(long chatId, int messageId) {
-      EditMessageText editMessage = new EditMessageText();
-      editMessage.setChatId(chatId);
-      editMessage.setMessageId(messageId);
-      editMessage.setText("⚡ Selecciona la app frecuente:");
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("⚡ Selecciona la app frecuente:");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -883,7 +883,7 @@ public class ResponseHandler {
 
       InlineKeyboardButton backButton = new InlineKeyboardButton();
       backButton.setText("🔙 Volver");
-      backButton.setCallbackData("tunnel_menu");
+      backButton.setCallbackData("tunnel_frequent_dismiss");
 
       for (FrequentAppEntity app : enabledApps) {
          InlineKeyboardButton appButton = new InlineKeyboardButton();
@@ -905,9 +905,9 @@ public class ResponseHandler {
       }
 
       markup.setKeyboard(keyboard);
-      editMessage.setReplyMarkup(markup);
+      message.setReplyMarkup(markup);
 
-      sender.execute(editMessage);
+      sender.execute(message);
    }
 
    private void handleTunnelFrequentAppSelection(long chatId, int messageId, String callbackData) {
@@ -916,10 +916,9 @@ public class ResponseHandler {
    }
 
    private void replyToTunnelFrequentDurationSelection(long chatId, int messageId, String serviceName) {
-      EditMessageText editMessage = new EditMessageText();
-      editMessage.setChatId(chatId);
-      editMessage.setMessageId(messageId);
-      editMessage.setText("⏰ Selecciona el período disponible para " + serviceName + ":");
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText("⏰ Selecciona el período disponible para " + serviceName + ":");
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -935,15 +934,15 @@ public class ResponseHandler {
       row2.add(createDurationButton("7 días", "tunnel_frequent_duration_" + serviceName + "_10080"));
 
       List<InlineKeyboardButton> row3 = new ArrayList<>();
-      row3.add(createDurationButton("🔙 Volver", "tunnel_frequent"));
+      row3.add(createDurationButton("🔙 Volver", "tunnel_frequent_dismiss"));
 
       keyboard.add(row1);
       keyboard.add(row2);
       keyboard.add(row3);
       markup.setKeyboard(keyboard);
-      editMessage.setReplyMarkup(markup);
+      message.setReplyMarkup(markup);
 
-      sender.execute(editMessage);
+      sender.execute(message);
    }
 
    private void handleTunnelFrequentDurationSelection(long chatId, int messageId, String callbackData) {
@@ -958,10 +957,9 @@ public class ResponseHandler {
 
       String durationText = formatDuration(durationMinutes);
 
-      EditMessageText editMessage = new EditMessageText();
-      editMessage.setChatId(chatId);
-      editMessage.setMessageId(messageId);
-      editMessage.setText(String.format(
+      SendMessage message = new SendMessage();
+      message.setChatId(chatId);
+      message.setText(String.format(
             "📋 *Resumen de la app frecuente*\n\n" +
             "⚡ *App:* %s\n" +
             "🔌 *Puerto:* %d\n" +
@@ -971,7 +969,7 @@ public class ResponseHandler {
             "¿Confirmás la creación del túnel?",
             serviceName, app.getPort(), durationText, app.getShortIoUrl()
       ));
-      editMessage.setParseMode(MARKDOWN);
+      message.setParseMode(MARKDOWN);
 
       InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
       List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -982,13 +980,13 @@ public class ResponseHandler {
 
       InlineKeyboardButton cancelButton = new InlineKeyboardButton();
       cancelButton.setText("❌");
-      cancelButton.setCallbackData("tunnel_menu");
+      cancelButton.setCallbackData("tunnel_frequent_dismiss");
 
       keyboard.add(List.of(confirmButton, cancelButton));
       markup.setKeyboard(keyboard);
-      editMessage.setReplyMarkup(markup);
+      message.setReplyMarkup(markup);
 
-      sender.execute(editMessage);
+      sender.execute(message);
    }
 
    private void handleTunnelFrequentConfirm(long chatId, String callbackData) {
