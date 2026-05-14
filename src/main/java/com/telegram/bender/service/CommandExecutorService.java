@@ -159,6 +159,46 @@ public class CommandExecutorService {
       }
    }
 
+   public boolean executeImmichBackup() {
+      try {
+         Process process = new ProcessBuilder("immich-borg-backup").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error executing immich-borg-backup: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean executeNextcloudBackup() {
+      try {
+         Process process = new ProcessBuilder("nextcloud-borg-backup").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error executing nextcloud-borg-backup: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean executeDockerBackup() {
+      try {
+         Process process = new ProcessBuilder("docker-borg-backup").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error executing docker-borg-backup: {}", ex.getMessage());
+         return false;
+      }
+   }
+
+   public boolean executeColdBackup() {
+      try {
+         Process process = new ProcessBuilder("external-disk-backup").start();
+         return process.waitFor() == 0;
+      } catch (Exception ex) {
+         log.error("Error executing external-disk-backup: {}", ex.getMessage());
+         return false;
+      }
+   }
+
    public Process executeCloudflaredTunnel(int port) throws Exception {
       try {
          Process process = new ProcessBuilder(
