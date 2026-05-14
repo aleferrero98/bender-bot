@@ -49,7 +49,7 @@ public class ResponseHandler {
       text.append("🎛️ /cooler - Controlar ventilación\n");
       text.append("🔗 /tunnel - Gestionar túneles\n");
       text.append("⚙️ /manage - Reiniciar, apagar, LEDs\n");
-      text.append("💾 /backup - Respaldar datos\n");
+      text.append("💾 /backups - Respaldar datos\n");
       text.append("❓ /help - Lista completa de comandos\n\n");
       text.append("_¿Querés que haga algo o solo mirás?_");
 
