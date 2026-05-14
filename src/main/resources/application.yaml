@@ -8,12 +8,6 @@ spring:
         url: https://api.short.io
         token: ${SHORT_IO_TOKEN}
         domain-id: ${SHORT_IO_DOMAIN_ID}
-        link-id:
-          bender: ${SHORT_IO_BENDER_LINK_ID}
-          immich: ${SHORT_IO_IMMICH_LINK_ID}
-          nextcloud: ${SHORT_IO_NEXTCLOUD_LINK_ID}
-          spliit: ${SHORT_IO_SPLIIT_LINK_ID}
-          pingvin-share: ${SHORT_IO_PINGVIN_SHARE_LINK_ID}
 
   datasource:
     url: jdbc:mysql://localhost:3303/bender_bot?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Argentina/Cordoba
@@ -35,16 +29,9 @@ logging:
       springframework: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK:WARN}
       hibernate:
         SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:DEBUG}
-        type:
-          descriptor:
-            sql:
-              BasicBinder: ${LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER:TRACE}
 
 telegram:
   bot:
     username: ${TELEGRAM_BOT_USERNAME}
     token: ${TELEGRAM_BOT_TOKEN}
     creator: ${TELEGRAM_BOT_CREATOR}
-
-
-
